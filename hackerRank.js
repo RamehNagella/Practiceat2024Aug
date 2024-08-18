@@ -1165,9 +1165,220 @@ Returns
 
 int: the number of valleys traversed
 */
-DDUUUUDD;
+// DDUUUUDD;
 //
 // if hiker is get value as D then he start to go for down untill he gets one up U (that is the vally condition given in question)
 //after that
 //if hiker gets value as U he starts to walk for up untill he gets D after that  (mountain condition )
 // if he gets D he goes to down if he gets U he goes to up
+
+//from the above coclusions  we can write as
+
+// 1. if one up(U) was started from there onwards we need to count the value
+// untill he gets D. If he gets D we dont have to count the value as minus.There
+// we need to stop counting for that D. after what happened for that we need to
+// start counting. Because the counting will start at U and end at D for mountain
+// otherwise counting will start at D and stop at U for valley
+//at stoping point we dont have to count
+
+//i have two strings U&D, what I want is when word start with D the count has to decrease from 0 untill
+// it reaches to U, once it reached to U then it stop the counting. and subsequenctly if the next word start
+// with U after thr stoping word U in the previous count  then again count has to increase in positive direction.
+// for that write a javascript code if I have the string like UDDDUDUU
+/*
+Sure! Let’s break down the question in detail.
+
+### Problem Description:
+You’re given a sequence of steps taken during a hike, and each step is either an uphill (`U`) or a downhill (`D`). The hiker starts and ends the hike at sea level, which means the elevation is 0 at the beginning and the end of the hike.
+
+### Terms to Understand:
+
+1. **Sea Level**: 
+   - The hiker's altitude starts at 0, which represents sea level.
+
+2. **Uphill (`U`)**: 
+   - Every time the hiker takes an uphill step, their altitude increases by 1 unit.
+
+3. **Downhill (`D`)**: 
+   - Every time the hiker takes a downhill step, their altitude decreases by 1 unit.
+
+4. **Mountain**:
+   - A mountain is defined as a sequence of consecutive steps where the hiker starts from sea level (0), climbs up to a point above sea level, and then returns back to sea level.
+
+5. **Valley**:
+   - A valley is defined as a sequence of consecutive steps where the hiker starts from sea level (0), descends below sea level (altitude becomes negative), and then eventually returns back to sea level.
+
+### Example Breakdown:
+Let’s consider the example given:
+
+- **Steps**: `8`
+- **Path**: `"DDUUUUDD"`
+
+This is the sequence of steps the hiker took:
+- **`D`**: Downhill (altitude decreases)
+- **`D`**: Downhill (altitude decreases further)
+- **`U`**: Uphill (altitude increases)
+- **`U`**: Uphill (altitude increases further)
+- **`U`**: Uphill (altitude increases further)
+- **`U`**: Uphill (altitude increases further)
+- **`D`**: Downhill (altitude decreases)
+- **`D`**: Downhill (altitude decreases further)
+
+### Altitude Changes:
+Let’s track the altitude step by step:
+
+1. Start at sea level: `0`
+2. First `D`: Downhill to `-1`
+3. Second `D`: Downhill to `-2` (the hiker is now below sea level, inside a valley)
+4. First `U`: Uphill to `-1`
+5. Second `U`: Uphill to `0` (the hiker has come back to sea level, so the valley ends here)
+6. Third `U`: Uphill to `1` (the hiker is now above sea level, possibly starting a mountain)
+7. Fourth `U`: Uphill to `2` (still above sea level, inside the mountain)
+8. First `D`: Downhill to `1`
+9. Second `D`: Downhill to `0` (back to sea level, ending the mountain)
+
+### Counting Valleys:
+- **Valley 1**: The hiker starts going down with the first two `D` steps (reaching `-2`), then 
+comes back up to sea level with the next two `U` steps.
+- The rest of the steps take the hiker up a mountain and back to sea level, but we’re only 
+interested in counting valleys.
+
+**Total Valleys**: `1`
+
+### Function Goal:
+The function `countingValleys` is supposed to calculate how many such valleys the hiker goes through 
+based on the provided sequence of steps (`path`). 
+
+### Summary:
+The hiker’s path is represented by a string where `U` and `D` indicate changes in altitude. 
+Your task is to count how many valleys (periods where the hiker goes below sea level and then 
+returns to sea level) occur during the hike. The hike always starts and ends at sea level.
+*/
+function countingValleys(steps, path) {
+  let altitude = 0;
+  let valleys = 0;
+  let inValley = false;
+
+  for (let i = 0; i < steps; i++) {
+    if (path[i] === "U") {
+      altitude++;
+    } else if (path[i] === "D") {
+      altitude--;
+    }
+    // console.log("Start hiking");
+    // console.log("aa11", altitude);
+
+    // console.log("vv11", valleys);
+    // console.log(">>>>>>>>>", altitude < 0 && !inValley);
+
+    // Check if the hiker is entering a valley
+    if (altitude < 0 && !inValley) {
+      inValley = true;
+    }
+
+    // Check if the hiker is leaving a valley
+    if (altitude === 0 && inValley) {
+      valleys++;
+      inValley = false;
+    }
+    // console.log("vvc", inValley);
+    // console.log("vv", valleys);
+  }
+  // console.log("aa", altitude);
+  return valleys;
+}
+
+// Example usage:
+const steps = 8;
+const path = "DDUUUUDD";
+const result2 = countingValleys(steps, path);
+console.log(result2); // Output: 1
+/*
+Start hiking
+aa11 -1
+vv11 0
+>>>>>>>>> true
+vvc true
+vv 0
+Start hiking
+aa11 -2
+vv11 0
+>>>>>>>>> false
+vvc true
+vv 0
+Start hiking
+aa11 -1
+vv11 0
+>>>>>>>>> false
+vvc true
+vv 0
+Start hiking
+aa11 0
+vv11 0
+>>>>>>>>> false
+vvc false
+vv 1
+Start hiking
+aa11 1
+vv11 1
+>>>>>>>>> false
+vvc false
+vv 1
+Start hiking
+aa11 2
+vv11 1
+>>>>>>>>> false
+vvc false
+vv 1
+Start hiking
+aa11 1
+vv11 1
+>>>>>>>>> false
+vvc false
+vv 1
+Start hiking
+aa11 0
+vv11 1
+>>>>>>>>> false
+vvc false
+vv 1
+aa 0
+1
+*/
+//
+//1. altitude hike will be increased if hiker goes U (uphiii)
+//2. Altitude hike will be decreased if hiker goes D (downhill)
+//3. if alttitude is less than see level  and valley condition is true
+// then valley count will increased
+// valley condition: initially valley is set to false because at that point
+// of time hiker is at see level and he is not in the valley so inValley: false
+// inValley turned true when hiker is below the see level && !isValley
+
+// valley count is increased when altitude is equal to 0 and invalley condition is true
+//
+//
+function countingValleys1(steps, path) {
+  // Write your code here
+  let altitude = 0;
+  let valleys = 0;
+  let inValley = false; //(it gets true if altitude is less thatn 1)
+
+  for (let i = 0; i < steps; i++) {
+    if (path[i] === "D") {
+      altitude--;
+    } else if (path[i] === "U") {
+      altitude++;
+    }
+    //check hiker is in valley or not. If hiker is in valley change inValley to true otherwise dont
+    if (altitude < 0 && !inValley) {
+      inValley = true;
+    }
+    // increase the valley count if hiker goes down and come to see level and inValley is true;
+    if (altitude === 0 && inValley) {
+      valleys++;
+      inValley = false; // becasue after count we need to start from begining,since hiker is at see level not in under the see level
+    }
+  }
+  return valleys;
+}
+console.log(countingValleys1(10, "UUDDDUDUDD"));

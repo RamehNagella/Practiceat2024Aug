@@ -2945,3 +2945,1331 @@ db.users.updateMany(
 // Here's the difference between them:
 // First Query ($): Only removes goodFrequency from the first matching element in the hobbies array.
 // Second Query ($[]): Removes goodFrequency from all elements in the hobbies array where goodFrequency exists.
+
+//remove good frequency field
+//find the docs which has good Frequncy field
+db.users
+  .find({ "hobbies.goodFrequency": { $exists: true } }, { name: 1, hobbies: 1 })
+  .pretty();
+db.users
+  .find(
+    { hobbies: { $elemMatch: { goodFrequency: { $exists: true } } } },
+    { name: 1, hobbies: 1 }
+  )
+  .pretty();
+/*
+{
+	  "_id" : ObjectId("66bc16d23d6802bbff2744dd"),
+	  "name" : "Max",
+	  "hobbies" : [
+		  {
+			  "title" : "Sports",
+			  "frequency" : 2,
+			  "highFrequency" : true,
+			  "goodFrequency" : "yes"
+		  },
+		  {
+			  "title" : "Cooking",
+			  "frequency" : 3
+		  }
+	  ]
+  }
+  {
+	  "_id" : ObjectId("66bc2cdd3d6802bbff2744e2"),
+	  "name" : "Jack",
+	  "hobbies" : [
+		  {
+			  "title" : "Walking",
+			  "frequency" : 1
+		  },
+		  {
+			  "title" : "shopping",
+			  "frequency" : 2,
+			  "goodFrequency" : "yes"
+		  }
+	  ]
+  }
+  {
+	  "_id" : ObjectId("66bc2cdd3d6802bbff2744e3"),
+	  "name" : "Jacks",
+	  "hobbies" : [
+		  {
+			  "title" : "Walking",
+			  "frequency" : 1
+		  },
+		  {
+			  "title" : "shopping",
+			  "frequency" : 2,
+		  }
+		  goodFrequency:"yes"
+	  ]
+  }
+
+  When to Use Which:
+// First Query: Use it when you just need to check for the existence of a field in 
+// any element of the array.
+// Second Query: Use it when you need to match a specific condition within a 
+// single array element and when dealing with more complex queries where multiple
+// conditions within an array element need to be met.
+Conclusion:
+Both queries will yield the same results with the provided documents.
+Choose the first query ("hobbies.goodFrequency": { $exists: true }) for 
+simplicity when you only need to check if the field exists anywhere in the array.
+/********** 
+Choose the second query ($elemMatch) if you need more control or if you're 
+working with more complex conditions within the array.
+*/
+//removing the field in the array using $unset operator
+db.users.updateMany(
+  { hobbies: { $elemMatch: { goodFrequency: { $exists: true } } } },
+  { $unset: { "hobbies.$[].goodFrequency": "" } }
+);
+// { "acknowledged" : true, "matchedCount" : 2, "modifiedCount" : 2 }
+db.users.updateMany(
+  { hobbies: { $elemMatch: { goodFrequency: { $exists: true } } } },
+  { $unset: { "hobbies.$.goodFrequency": "" } }
+);
+// { "acknowledged" : true, "matchedCount" : 0, "modifiedCount" : 0 }
+db.users.find({}, { name: 1, hobbies: 1 }).pretty();
+/*
+{
+	"_id" : ObjectId("66bc16d23d6802bbff2744dd"),
+	"name" : "Max",
+	"hobbies" : [
+		{
+			"title" : "Sports",
+			"frequency" : 2,
+			"highFrequency" : true
+		},
+		{
+			"title" : "Cooking",
+			"frequency" : 3
+		}
+	]
+}
+and more
+*/
+//update the document which has sports as hobbie for 2 or 1 time a day for them add a field hasGoodFrequncy:true
+//find the document whose spors:true and frequency:{$lt:2}
+db.users.find(
+  {
+    hobbies: {
+      $elemMatch: { title: "Sports", frequency: { $and: ["$gte:1", "$lte:2"] } }
+    }
+  },
+  { hobbies: 1 }
+);
+// Error: error: {
+// "ok" : 0,
+// "errmsg" : "unknown operator: $and",
+// "code" : 2,
+// "codeName" : "BadValue"
+// }
+db.users.find(
+  { hobbies: { $elemMatch: { title: "Sports", frequency: { $lte: 2 } } } },
+  { hobbies: 1 }
+);
+db.users.find(
+  { hobbies: { title: "Sports", frequency: { $lte: 2 } } },
+  { hobbies: 1 }
+);
+db.users
+  .find(
+    { hobbies: { $elemMatch: { title: "Sports", frequency: { $lte: 2 } } } },
+    { hobbies: 1 }
+  )
+  .pretty();
+
+/*{
+	"_id" : ObjectId("66bc16d23d6802bbff2744dd"),
+	"hobbies" : [
+		{
+			"title" : "Sports",
+			"frequency" : 2,
+			"highFrequency" : true
+		},
+		{
+			"title" : "Cooking",
+			"frequency" : 3
+		}
+	]
+}
+{
+	"_id" : ObjectId("66bc16d23d6802bbff2744df"),
+	"hobbies" : [
+		{
+			"title" : "Sports",
+			"frequency" : 1
+		},
+		{
+			"title" : "teaching",
+			"frequency" : 5
+		}
+	]
+}
+{
+	"_id" : ObjectId("66bc2e5a3d6802bbff2744e4"),
+	"hobbies" : [
+		{
+			"title" : "Sports",
+			"frequency" : 2,
+			"highFrequency" : true
+		},
+		{
+			"title" : "Cooking",
+			"frequency" : 1
+		}
+	]
+}
+*/
+//find only the docs which has frequency 1 and 2
+db.users
+  .find({
+    hobbies: { $elemMatch: { title: "Sports", frequency: { $and: [1, 2] } } }
+  })
+  .count();
+// 2024-08-17T11:40:48.674+0530 E QUERY    [thread1] Error: count failed: {
+// 	"ok" : 0,
+// 	"errmsg" : "unknown operator: $and",
+db.users
+  .find({
+    hobbies: { $elemMatch: { title: "Sports", frequency: { $in: [1, 2] } } }
+  })
+  .count();
+3;
+
+//now add field hasGood frequency where sports has hobby of 2 times less
+db.users.updateMany(
+  { hobbies: { $elemMatch: { title: "Sports", frequency: { $in: [1, 2] } } } },
+  { "hobbies.$.hasGoodFrequency": true }
+);
+// 2024-08-17T11:56:23.457+0530 E QUERY    [thread1] Error: the update operation document must contain atomic operators :
+// DBCollection.prototype.updateMany@src/mongo/shell/crud_api.js:625:1
+// @(shell):1:1
+db.users.updateMany(
+  { hobbies: { $elemMatch: { title: "Sports", frequency: { $in: [1, 2] } } } },
+  { $set: { "hobbies.$.hasGoodFrequency": true } }
+);
+// { "acknowledged" : true, "matchedCount" : 3, "modifiedCount" : 3 }
+db.users
+  .find({
+    hobbies: { $elemMatch: { title: "Sports", frequency: { $in: [1, 2] } } }
+  })
+  .count();
+3;
+db.users.updateMany(
+  { hobbies: { $elemMatch: { title: "Sports", frequency: { $in: [1, 2] } } } },
+  { $set: { "hobbies.$[].hasGoodHealth": true } }
+);
+// { "acknowledged" : true, "matchedCount" : 3, "modifiedCount" : 3 }
+db.users.find({}, { hobbies: 1 }).pretty();
+/*
+{
+	"_id" : ObjectId("66bc16d23d6802bbff2744dd"),
+	"hobbies" : [
+		{
+			"title" : "Sports",
+			"frequency" : 2,
+			"highFrequency" : true,
+			"hasGoodFrequency" : true,
+			"hasGoodHealth" : true
+		},
+		{
+			"title" : "Cooking",
+			"frequency" : 3,
+			"hasGoodHealth" : true
+		}
+	]
+}
+{
+	"_id" : ObjectId("66bc16d23d6802bbff2744df"),
+	"hobbies" : [
+		{
+			"title" : "Sports",
+			"frequency" : 1,
+			"hasGoodFrequency" : true,
+			"hasGoodHealth" : true
+		},
+		{
+			"title" : "teaching",
+			"frequency" : 5,
+			"hasGoodHealth" : true
+		}
+	]
+}
+{
+	"_id" : ObjectId("66bc2cdd3d6802bbff2744e2"),
+	"hobbies" : [
+		{
+			"title" : "Walking",
+			"frequency" : 1
+		},
+		{
+			"title" : "shopping",
+			"frequency" : 2
+		}
+	]
+}
+{
+	"_id" : ObjectId("66bc2e5a3d6802bbff2744e4"),
+	"hobbies" : [
+		{
+			"title" : "Sports",
+			"frequency" : 2,
+			"highFrequency" : true,
+			"hasGoodFrequency" : true,
+			"hasGoodHealth" : true
+		},
+		{
+			"title" : "Cooking",
+			"frequency" : 1,
+			"hasGoodHealth" : true
+		}
+	]
+}
+{
+	"_id" : ObjectId("66bd73baaf3abccac1c4a1cb"),
+	"hobbies" : [
+		{
+			"title" : "Sports",
+			"frequency" : 3,
+			"highFrequency" : true
+		},
+		{
+			"title" : "Cooking",
+			"frequency" : 3
+		},
+		{
+			"title" : "Hiking",
+			"frequency" : 1
+		}
+	]
+}
+{
+	"_id" : ObjectId("66bed0a429bb79f34a966a1c"),
+	"hobbies" : [
+		{
+			"title" : "Listening to music",
+			"frequency" : "3"
+		},
+		{
+			"title" : "Cooking",
+			"frequency" : 2
+		}
+	]
+}
+*/
+// if you observe the above result
+// the update operation hasGoodFrequency: true is done with .$ operator
+// the update operation hasGoodHealth: true  is done with .$[] operator
+//  WITH SPECIFIED FITER CONDITION
+// NOW WHAT HAPPENED IS    @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@2
+// .$ operator will work on the fields only where there is a specified field
+// condition will be appilcable for entire objects in the array i.e in the above filter
+// we have defined title:"Sports" and frequency:{$in:[1,2]}
+// to work with .$ operator both are in the same object therefore it adds the new field whcih we written
+//Only the first matching element of the hobbies array in the matched documents will have hasGoodFrequency
+// set to true. Other elements in the hobbies array will remain unchanged.
+
+//BUT .$[] will work on all the objects if the condition is SATISFIED ON ONE OBJECT OF THE ARRAY
+//THEN .$[] OPEARATOR WILL WORK(update) ON ALL OBJECTS WITHIN THE ARRAY
+// Every element of the hobbies array in the matched documents will have hasGoodHealth set to true
+db.users.updateMany(
+  { hobbies: { $elemMatch: { title: "Sports", frequency: { $in: [1, 2] } } } },
+  { $set: { "hobbies.$[].hasGoodHealth": true } }
+);
+db.users.updateMany(
+  { hobbies: { $elemMatch: { title: "Sports", frequency: { $in: [1, 2] } } } },
+  { $set: { "hobbies.$.hasGoodFrequency": true } }
+);
+// what is the difference between them?
+// Scope of Update:
+
+// Query 1: Updates all elements in the hobbies array in the matched documents.
+// Query 2: Updates only the first matching element in the hobbies array in the matched documents.
+
+db.users.updateMany(
+  {
+    hobbies: {
+      $elemMatch: {
+        title: "Sports",
+        frequency: { $in: [1, 2] }
+      }
+    }
+  },
+  {
+    $set: { "hobbies.$[el].hasGoodHealth": true },
+    arrayFilters: [{ "el.frequency": { $in: [1, 2] } }]
+  }
+);
+// Summary of Key Differences:
+
+// Scope of Update:
+
+// Query 1: Updates only the first matching element in the array.
+// Query 2: Updates all elements in the array.
+// Query 3: Updates elements in the array that meet specific conditions defined by arrayFilters.
+
+// Targeted Elements:
+
+// Query 1: Uses the positional operator $ to target the first matching element.
+// Query 2: Uses the all positional operator $[] to target all elements.
+// Query 3: Uses $[el] with arrayFilters to target elements based on custom filter conditions.
+// The arrayFilters option specifies which elements in the array should be updated based on
+// additional criteria.
+
+db.users.updateMany(
+  {
+    hobbies: {
+      $elemMatch: {
+        "title.Sports": { $exists: false },
+        frequency: { $in: [1, 2] }
+      }
+    }
+  },
+  {
+    $set: { "hobbies.$[el].hasGoodHealth": true },
+    arrayFilters: [{ "el.frequency": { $in: [1, 2] } }]
+  }
+);
+//2024-08-17T12:39:40.146+0530 E QUERY    [thread1] WriteError: No array filter found for identifier 'el'
+// in path 'hobbies.$[el].hasGoodHealth' :
+// WriteError({
+// 	"index" : 0,
+// 	"code" : 2,
+// 	"errmsg" : "No array filter found for identifier 'el' in path 'hobbies.$[el].hasGoodHealth'",
+/*
+The error you're encountering indicates that MongoDB couldn't find an array filter for the identifier el in 
+your query. Let's break down what's happening and how to correct your query.
+
+Understanding the Error
+
+Array Filters:
+
+arrayFilters is used with $[<identifier>] to specify which elements of 
+the array should be updated based on certain conditions.
+In your query, you used $[el] but provided a filter with arrayFilters that 
+doesn't match the query criteria, which leads to the error.
+Issue with the Query:
+
+The query attempts to match documents where an element with title: "Sports" does not exist. However, 
+MongoDB's $elemMatch condition needs to be properly formatted to check for the absence of the Sports title.
+
+To update documents that do not have a Sports hobby, you should:
+
+Find Documents without Sports in hobbies:
+
+Use the $nor operator to find documents where no hobbies element has 
+title: "Sports"
+Update Documents:
+
+Set the new field for all elements in the hobbies array where 
+the frequency is in [1, 2].
+*/
+db.users.updateMany(
+  {
+    hobbies: {
+      $not: {
+        $elemMatch: { title: "Sports" }
+      }
+    }
+  },
+  {
+    $set: { "hobbies.$[el].hasGoodHealth": true },
+    arrayFilters: [{ "el.frequency": { $in: [1, 2] } }]
+  }
+);
+/*
+Explanation
+
+Query Condition:
+{ hobbies: { $not: { $elemMatch: { title: "Sports" } } } }: 
+This condition finds documents where no element in the hobbies array has title: "Sports".
+
+Update Operation:
+{ $set: { "hobbies.$[el].hasGoodHealth": true } }: Sets hasGoodHealth to 
+true for elements that match the criteria in arrayFilters.
+
+Array Filters:
+arrayFilters: [{ "el.frequency": { $in: [1, 2] } }]: Specifies that 
+the update should be applied to elements in the hobbies array where frequency is in [1, 2].
+
+Summary
+
+Use $not with $elemMatch to find documents where the hobbies array does 
+not contain an element with title: "Sports".
+Apply the $set update with the appropriate arrayFilters to modify specific 
+elements within the hobbies array.
+*/
+///*************************************************** */
+// i wrote the query like that i want to update documets which does not has
+// frequency as its hobby and frequency of one of the other hobbies are either 1 or 2
+db.users.find({
+  hobbies: {
+    $not: { $elemMatch: { title: "Sports" } },
+    frequency: { $in: [1, 2] }
+  }
+});
+
+// is tht correct or not? what is correct query?
+Objective;
+
+// Find documents that do not have a hobby with the title "Sports".
+// Update these documents where at least one other hobby's frequency is either 1 or 2.
+
+// db.users.find({
+// 	hobbies:{
+// 		$not:{
+// 				$elemMatch:{title:"Sports"}
+// 			},
+// 			{$elemMatch:{   //**************************** here it is wrong  */
+// 				frequency:{$in:[1,2]}
+// 						}
+// 			}
+// 		}
+// 	},
+// 	{hobbies:1}
+// )
+
+db.users.find(
+  {
+    hobbies: {
+      $not: {
+        $elemMatch: { title: "Sports" }
+      },
+      $elemMatch: {
+        frequency: { $in: [1, 2] }
+      }
+    }
+  },
+  { hobbies: 1 }
+);
+/*
+{
+	"_id" : ObjectId("66bc2cdd3d6802bbff2744e2"),
+	"hobbies" : [
+		{
+			"title" : "Walking",
+			"frequency" : 1
+		},
+		{
+			"title" : "shopping",
+			"frequency" : 2
+		}
+	]
+}
+{
+	"_id" : ObjectId("66bed0a429bb79f34a966a1c"),
+	"hobbies" : [
+		{
+			"title" : "Listening to music",
+			"frequency" : "3"
+		},
+		{
+			"title" : "Cooking",
+			"frequency" : 2
+		}
+	]
+}
+*/
+/*db.users.find({hobbies:{$not:{$elemMatch:{title:"Sports"}}, $elemMatch:{frequency:{$in:[1,2]}}}}).count()
+2
+> db.users.updateMany(   {     hobbies: {       $not: { $elemMatch: { title: "Sports" } },       $elemMatch: { frequency: { $in: [1, 2] } }     }   },   {     $set: { "hobbies.$[el].hasGoodHealth": true },     arrayFilters: [{ "el.frequency": { $in: [1, 2] } }]   } );db.users.updateMany(
+...   {
+...     hobbies: {
+...       $not: { $elemMatch: { title: "Sports" } },
+...       $elemMatch: { frequency: { $in: [1, 2] } }
+...     }
+...   },
+...   {
+...     $set: { "hobbies.$[el].hasGoodHealth": true },
+...     arrayFilters: [{ "el.frequency": { $in: [1, 2] } }]
+...   }
+... );
+2024-08-17T13:33:40.320+0530 E QUERY    [thread1] WriteError: No array filter found for identifier 'el' in path 'hobbies.$[el].hasGoodHealth' :
+WriteError({
+	"index" : 0,
+	"code" : 2,
+	"errmsg" : "No array filter found for identifier 'el' in path 'hobbies.$[el].hasGoodHealth'",
+ even I have the documents with specified filter, why its  getting error like no array filter foung for identifier then correct query is to updated the documents for the questions  Find documents that do not have a hobby with the title "Sports".
+Update these documents where at least one other hobby's frequency is either 1 or 2. if I hava a documents like this below    {
+	"_id" : ObjectId("66bc2cdd3d6802bbff2744e2"),
+	"hobbies" : [
+		{
+			"title" : "Walking",
+			"frequency" : 1
+		},
+		{
+			"title" : "shopping",
+			"frequency" : 2
+		}
+	]
+}
+{
+	"_id" : ObjectId("66bed0a429bb79f34a966a1c"),
+	"hobbies" : [
+		{
+			"title" : "Listening to music",
+			"frequency" : "3"
+		},
+		{
+			"title" : "Cooking",
+			"frequency" : 2
+		}
+	]
+}
+ChatGPT said:
+ChatGPT
+It looks like the main issue with your queries is how the $elemMatch operator is used in conjunction with array filters. Array filters can only be applied if the elements in the array match the conditions provided in the arrayFilters.
+
+Problem Breakdown
+Finding Documents:
+
+Your find query is correctly identifying documents that do not have a hobby with the title "Sports" and have at least one other hobby with a frequency of 1 or 2. The count of 2 suggests that two documents meet this criteria.
+Updating Documents:
+
+The error No array filter found for identifier 'el' in path 'hobbies.$[el].hasGoodHealth' indicates that the array filter el does not match any elements in the documents returned by the find query. This is likely because the filter does not apply to any elements in the documents' hobbies array.
+Correct Query Approach
+1. Find Documents That Match Your Criteria
+
+Your find query is already correct. It identifies documents where no hobby has the title "Sports" and where at least one hobby has a frequency of 1 or 2:
+
+javascript
+Copy code
+db.users.find({
+  hobbies: {
+    $not: { $elemMatch: { title: "Sports" } },
+    $elemMatch: { frequency: { $in: [1, 2] } }
+  }
+});
+2. Update Documents
+
+To update the documents where at least one hobby’s frequency is 1 or 2, you need to ensure that the array filter is applied correctly. Since $elemMatch is used to match the whole document, you should use a more precise query and update operation.
+
+Here is the correct approach:
+
+Find Documents
+
+javascript
+Copy code
+db.users.find({
+  hobbies: {
+    $not: { $elemMatch: { title: "Sports" } },
+    $elemMatch: { frequency: { $in: [1, 2] } }
+  }
+});
+Update Operation
+
+To update these documents, you need to use the $[] (all array elements) operator to apply changes to every element in the array. However, this will update all elements of the hobbies array in the matched documents, which is not what you want. Instead, you should use a more targeted approach.
+
+Here’s how you can update the matched documents correctly:
+
+javascript
+Copy code
+db.users.updateMany(
+  {
+    hobbies: {
+      $not: { $elemMatch: { title: "Sports" } },
+      $elemMatch: { frequency: { $in: [1, 2] } }
+    }
+  },
+  {
+    $set: { "hobbies.$[el].hasGoodHealth": true },
+    arrayFilters: [{ "el.frequency": { $in: [1, 2] } }]
+  }
+);
+Explanation:
+
+hobbies.$[el].hasGoodHealth: Sets the hasGoodHealth field for array elements that match the filter specified in arrayFilters.
+arrayFilters: [{ "el.frequency": { $in: [1, 2] } }]: Filters array elements where frequency is 1 or 2.
+Common Pitfall:
+
+Make sure that there are elements in the hobbies array with frequency 1 or 2 that are also being updated. The $[el] filter only applies to array elements that match the filter specified in arrayFilters.
+Troubleshooting
+Verify Document Structure:
+
+Ensure that the documents returned by the find query have the correct structure and that the hobbies array contains elements that match the arrayFilters.
+Test Find Query Separately:
+
+Run the find query to make sure it correctly identifies the documents you want to update.
+Check Array Filters:
+
+Ensure that the arrayFilters used in the update operation correctly match elements in the array.
+By ensuring these conditions are met, the update operation should work as expected.
+
+You said:
+no, for the above queries iam getting same error  2024-08-17T13:37:50.578+0530 E QUERY    [thread1] WriteError: No array filter found for identifier 'el' in path 'hobbies.$[el].hasGoodHealth' :
+WriteError({
+	"index" : 0,
+	"code" : 2,
+	"errmsg" : "No array filter found for identifier 'el' in path 'hobbies.$[el].hasGoodHealth'",
+ what is the reason 
+ChatGPT said:
+ChatGPT
+The error No array filter found for identifier 'el' in path 'hobbies.$[el].hasGoodHealth' means that the array filter el specified in arrayFilters did not match any elements in the hobbies array of the documents being updated.
+
+Let's break down the problem and fix the update operation.
+
+Understanding the Issue
+Error Explanation: The WriteError indicates that the array filter el does not match any elements in the array for the documents found by your query. This could happen if:
+
+The array filter condition ("el.frequency": { $in: [1, 2] }) does not match any element in the hobbies array of the documents that the query finds.
+The arrayFilters syntax is correct, but no element in the hobbies array of the matched documents meets the criteria specified in the filter.
+Array Filters Usage: arrayFilters are used to specify which elements in the array should be updated. The arrayFilters condition must match elements in the array for the update operation to succeed.
+
+Steps to Fix the Issue
+Verify the Find Query: Make sure that the find query correctly identifies the documents you want to update and that these documents have the structure you expect.
+
+javascript
+Copy code
+db.users.find({
+  hobbies: {
+    $not: { $elemMatch: { title: "Sports" } },
+    $elemMatch: { frequency: { $in: [1, 2] } }
+  }
+}).pretty();
+Update Query with Correct Array Filter: Ensure that the array filter used in the update query matches the elements of the array in the documents. Here’s the corrected update query:
+
+javascript
+Copy code
+db.users.updateMany(
+  {
+    hobbies: {
+      $not: { $elemMatch: { title: "Sports" } },
+      $elemMatch: { frequency: { $in: [1, 2] } }
+    }
+  },
+  {
+    $set: { "hobbies.$[el].hasGoodHealth": true },
+    arrayFilters: [{ "el.frequency": { $in: [1, 2] } }]
+  }
+);
+Check for Array Content: Ensure that the documents identified by the query actually contain elements in the hobbies array with the frequency values of 1 or 2.
+
+Test with Sample Data: To further troubleshoot, you can test with simpler or more specific queries to see if the arrayFilters work correctly:
+
+javascript
+Copy code
+db.users.updateMany(
+  { hobbies: { $not: { $elemMatch: { title: "Sports" } } } },
+  { $set: { "hobbies.$[el].hasGoodHealth": true }, arrayFilters: [{ "el.frequency": { $in: [1, 2] } }] }
+);
+Make sure to test this with documents that match the criteria specified in your arrayFilters.
+
+Review Documents: Ensure that the documents in your database have the structure you expect, particularly the hobbies array and its elements. The filter condition must match the exact structure of the documents.
+
+Debugging the Issue
+Check Documents Manually: Manually review the documents to ensure they meet the criteria. For example:
+
+javascript
+Copy code
+db.users.find({ hobbies: { $elemMatch: { frequency: { $in: [1, 2] } } } }).pretty();
+Verify Array Filters: Make sure that the arrayFilters are correctly applied to elements of the array.
+
+By ensuring that the documents, array filters, and update query are all aligned correctly, you should be able to resolve the error and update the documents as intended.
+*/
+db.users.updateMany(
+  {
+    hobbies: {
+      $not: {
+        $elemMatch: { title: "Sports" }
+      },
+      $elemMatch: { frequency: { $lte: 2 } }
+    }
+  },
+  {
+    $set: { "hobbies.$[el].hasGoodHealth": "May be" },
+
+    arrayFilters: [{ "el.frequency": { $in: [1, 2] } }]
+  }
+);
+//this is also getting same error as above
+
+//adding fields using $PUSH operator ********************************************
+
+db.users.findOne({ name: "Maria" });
+/*
+{
+	"_id" : ObjectId("66bed0a429bb79f34a966a1c"),
+	"name" : "Maria",
+	"age" : 23,
+	"hobbies" : [
+		{
+			"title" : "Listening to music",
+			"frequency" : "3"
+		},
+		{
+			"title" : "Cooking",
+			"frequency" : 2
+		}
+	],
+	"isSport" : false
+}
+*/
+//for Maria document add a field like {title:"Sports", frequency:2} in her hobbies array
+
+db.users.updateOne(
+  { name: "Maria" },
+  { $push: { hobbies: { title: "Sports", frequency: 2 } } }
+);
+// { "acknowledged" : true, "matchedCount" : 1, "modifiedCount" : 1 }
+db.users.findOne({ name: "Maria" });
+/*
+{
+	"_id" : ObjectId("66bed0a429bb79f34a966a1c"),
+	"name" : "Maria",
+	"age" : 23,
+	"hobbies" : [
+		{
+			"title" : "Listening to music",
+			"frequency" : "3"
+		},
+		{
+			"title" : "Cooking",
+			"frequency" : 2
+		},
+		{
+			"title" : "Sports",
+			"frequency" : 2
+		}
+	],
+	"isSport" : false
+}
+*/
+//$push opearator can also be used for add multiple fields in the array
+db.users.updateOne(
+  { name: "Maria" },
+  {
+    $push: {
+      hobbies: {
+        $each: [
+          { title: "goodwine", frequency: 1 },
+          { title: "hiking", frequency: 2 }
+        ]
+      }
+    }
+  }
+);
+// { "acknowledged" : true, "matchedCount" : 1, "modifiedCount" : 1 }
+db.users.findOne({ name: "Maria" });
+/*
+{
+	"_id" : ObjectId("66bed0a429bb79f34a966a1c"),
+	"name" : "Maria",
+	"age" : 23,
+	"hobbies" : [
+		{
+			"title" : "Listening to music",
+			"frequency" : "3"
+		},
+		{
+			"title" : "Cooking",
+			"frequency" : 2
+		},
+		{
+			"title" : "Sports",
+			"frequency" : 2
+		},
+		{
+			"title" : "goodwine",
+			"frequency" : 1
+		},
+		{
+			"title" : "hiking",
+			"frequency" : 2
+		}
+	],
+	"isSport" : false
+}
+*/
+db.users.updateOne(
+  { name: "Maria" },
+  {
+    $push: {
+      hobbies: {
+        $each: [
+          { title: "eating", frequency: 3 },
+          { title: "running", frequency: 2 }
+        ]
+      }
+    }
+  },
+  { $sort: { frequncy: -1 } }
+);
+// { "acknowledged" : true, "matchedCount" : 1, "modifiedCount" : 1 }
+db.users.findOne({ name: "Maria" });
+/*
+{
+	"_id" : ObjectId("66bed0a429bb79f34a966a1c"),
+	"name" : "Maria",
+	"age" : 23,
+	"hobbies" : [
+		{
+			"title" : "Listening to music",
+			"frequency" : "3"
+		},
+		{
+			"title" : "Cooking",
+			"frequency" : 2
+		},
+		{
+			"title" : "Sports",
+			"frequency" : 2
+		},
+		{
+			"title" : "goodwine",
+			"frequency" : 1
+		},
+		{
+			"title" : "hiking",
+			"frequency" : 2
+		},
+		{
+			"title" : "eating",
+			"frequency" : 3
+		},
+		{
+			"title" : "running",
+			"frequency" : 2
+		}
+	],
+	"isSport" : false
+}
+*/
+db.users.updateOne(
+  { name: "Maria" },
+  {
+    $push: {
+      hobbies: {
+        $each: [
+          { title: "eating", frequency: 3 },
+          { title: "running", frequency: 2 }
+        ]
+      }
+    }
+  },
+  { $sort: { frequncy: 1 } }
+);
+// { "acknowledged" : true, "matchedCount" : 1, "modifiedCount" : 1 }
+db.users.findOne({ name: "Maria" });
+/*
+{
+	"_id" : ObjectId("66bed0a429bb79f34a966a1c"),
+	"name" : "Maria",
+	"age" : 23,
+	"hobbies" : [
+		{
+			"title" : "Listening to music",
+			"frequency" : "3"
+		},
+		{
+			"title" : "Cooking",
+			"frequency" : 2
+		},
+		{
+			"title" : "Sports",
+			"frequency" : 2
+		},
+		{
+			"title" : "goodwine",
+			"frequency" : 1
+		},
+		{
+			"title" : "hiking",
+			"frequency" : 2
+		},
+		{
+			"title" : "eating",
+			"frequency" : 3
+		},
+		{
+			"title" : "running",
+			"frequency" : 2
+		},
+		{
+			"title" : "eating",
+			"frequency" : 3
+		},
+		{
+			"title" : "running",
+			"frequency" : 2
+		}
+	],
+	"isSport" : false
+}
+*/
+//$push operator addds the element at the last position of the arry
+
+//**************************** */
+
+// removing elements in the array using $pull operator
+//which removes the last elements of the array
+
+db.users.updateOne(
+  { name: "Maria" },
+  { $pull: { hobbies: { title: "eating", frequency: 2 } } }
+);
+
+// { "acknowledged" : true, "matchedCount" : 1, "modifiedCount" : 0 }
+//No Exact Match: The hobbies array might not contain an element with both title: "eating" and frequency: 2. For the $pull operation to remove an element, both conditions must match exactly in the same element.
+db.users.updateOne(
+  { name: "Maria" },
+  { $pull: { hobbies: { title: "eating", frequency: 3 } } }
+);
+
+// { "acknowledged" : true, "matchedCount" : 1, "modifiedCount" : 1 }
+
+//
+//> //removing multiple elements from the array
+db.users.findOne({ name: "Maria" });
+/*
+{
+	"_id" : ObjectId("66bed0a429bb79f34a966a1c"),
+	"name" : "Maria",
+	"age" : 23,
+	"hobbies" : [
+		{
+			"title" : "Listening to music",
+			"frequency" : "3"
+		},
+		{
+			"title" : "Cooking",
+			"frequency" : 2
+		},
+		{
+			"title" : "Sports",
+			"frequency" : 2
+		},
+		{
+			"title" : "goodwine",
+			"frequency" : 1
+		},
+		{
+			"title" : "hiking",
+			"frequency" : 2
+		},
+		{
+			"title" : "running",
+			"frequency" : 2
+		},
+		{
+			"title" : "running",
+			"frequency" : 2
+		}
+	],
+	"isSport" : false
+}
+*/
+//$pull operator removed all elements having name with title:"eating" even this element is present for multiple times
+//removeing multiple elements with $pull operator
+db.users.updateOne(
+  { name: "Maria" },
+  {
+    $pull: {
+      hobbies: {
+        $each: [
+          { title: "running", frequency: 2 },
+          { title: "goodwine", frequency: 1 }
+        ]
+      }
+    }
+  }
+);
+/*
+	// 2024-08-17T16:45:23.014+0530 E QUERY    [thread1] WriteError: unknown top level operator: $each. 
+	If you have a field name that starts with a '$' symbol, consider using $getField or $setField. :
+	WriteError({
+		"index" : 0,
+		"code" : 2,
+		"errmsg" : "unknown top level operator: $each. If you have a field name that starts with 
+		a '$' symbol, consider using $getField or $setField."
+*/
+//The error you're encountering is due to the incorrect use of the $each operator.
+// The $each operator is typically used in conjunction with the $addToSet or $push operators to
+// add multiple items to an array, but it cannot be used with $pull.
+
+//but we can remove the multiple elements using $pull operator in conjuction  with $or operator
+
+db.users.updateOne(
+  { name: "Maria" },
+  {
+    $pull: {
+      hobbies: {
+        $each: [
+          { title: "running", frequency: 2 },
+          { title: "goodwine", frequency: 1 }
+        ]
+      }
+    }
+  }
+);
+/*
+{
+	"_id" : ObjectId("66bed0a429bb79f34a966a1c"),
+	"name" : "Maria",
+	"age" : 23,
+	"hobbies" : [
+		{
+			"title" : "Listening to music",
+			"frequency" : "3"
+		},
+		{
+			"title" : "Cooking",
+			"frequency" : 2
+		},
+		{
+			"title" : "Sports",
+			"frequency" : 2
+		},
+		{
+			"title" : "hiking",
+			"frequency" : 2
+		}
+	],
+	"isSport" : false
+}
+*/
+// with $pull we can remove desired elements by specific the desired elements in the query
+
+//can we remove the elements from multple documents using $pull operator
+
+// Yes, you can remove elements from arrays in multiple documents using
+// the $pull operator in MongoDB. The $pull operator can be applied in combination with updateMany to target multiple documents that match a given query.
+// example
+db.users.updateMany(
+  {},
+  {
+    $pull: {
+      hobbies: {
+        $or: [
+          { title: "running", frequency: 2 },
+          { title: "goodwine", frequency: 1 }
+        ]
+      }
+    }
+  }
+);
+//using $and operator with $pull opertor
+//remove Cooking and hiking elements from the hobbies array of the maria document
+db.users.updateOne(
+  { name: "Maria" },
+  {
+    $pull: {
+      hobbies: {
+        $and: [
+          { title: "Cooking", frequency: 2 },
+          { title: "hiking", frequency: 2 }
+        ]
+      }
+    }
+  }
+);
+// { "acknowledged" : true, "matchedCount" : 1, "modifiedCount" : 0 }
+// The $and operator cannot be used directly within the $pull operator in MongoDB.
+// This is why your query did not modify any documents, even though the query itself was acknowledged.
+
+// Why Can't You Use $and with $pull?
+// The $pull operator is designed to remove elements from an array that match a
+// specific condition. However, the condition inside $pull should describe a
+// single element of the array. The $and operator, when used in the way you tried,
+// is not applicable within the $pull operator because MongoDB expects a straightforward
+// match condition rather than a compound condition using $and.
+
+// TO REMOVE THE MULTIPLE ELEMENTS FROM THE ARRAY WE CAN USE $OR OPERATOR INCONJUCTION WITH $PULL OPERATOR
+//some times we want remove the last elements of the array
+//for that we can remove the $pop operator
+db.users.updateOne({ name: "Maria" }, { $pop: { hobbies: 1 } });
+// { "acknowledged" : true, "matchedCount" : 1, "modifiedCount" : 1 }
+db.users.findOne({ name: "Maria" });
+/*
+{
+	"_id" : ObjectId("66bed0a429bb79f34a966a1c"),
+	"name" : "Maria",
+	"age" : 23,
+	"hobbies" : [
+		{
+			"title" : "Listening to music",
+			"frequency" : "3"
+		},
+		{
+			"title" : "Cooking",
+			"frequency" : 2
+		},
+		{
+			"title" : "Sports",
+			"frequency" : 2
+		}
+	],
+	"isSport" : false
+}
+*/
+//removing first element from the array using $pop operator  ***************************
+db.users.updateOne({ name: "Maria" }, { $pop: { hobbies: -1 } });
+// { "acknowledged" : true, "matchedCount" : 1, "modifiedCount" : 1 }
+db.users.findOne({ name: "Maria" });
+/*
+{
+	"_id" : ObjectId("66bed0a429bb79f34a966a1c"),
+	"name" : "Maria",
+	"age" : 23,
+	"hobbies" : [
+		{
+			"title" : "Cooking",
+			"frequency" : 2
+		},
+		{
+			"title" : "Sports",
+			"frequency" : 2
+		}
+	],
+	"isSport" : false
+}
+*/
+// *********************************************************
+//*******************  #ADDTOSET OPERATOR  */
+/*
+The $addToSet operator in mongoDB is used to add a value to an array only if it does not 
+DOES NOT ALREADY EXIST IN THE  array. This operator ENSURES that array remains a set,
+meaning that it contains only UNIQUE values.
+
+//KEY POINTS
+.Uniqueness: Unlike $push, which appends an element to an array regardless of its current contents, 
+$addToSet only ADDS THE ELEMENT IF IT IS NOT ALREADY PRESENT.
+
+USE CASES:"$addToSet" is useful when you want to avoid duplicateds in an array.
+for examplle, it can be used to TRACK a list of tags, userIDs, or other unirque identifiers.
+
+OPERATION;If the value you are trying to add already exists in the array, MongoDb will ignore
+the operation and leave the array unchanged.
+The $addToSet operator is a powerful tool in MongoDB for maintaining uniqueness within an array. 
+It is especially useful in situations where you want to ensure that a list of values, such as tags or 
+hobbies, does not contain duplicates.
+*/
+db.users.updateOne(
+  { name: "Maria" },
+  { $addToSet: { hobbies: { title: "Hiking", frequency: 2 } } }
+);
+// { "acknowledged" : true, "matchedCount" : 1, "modifiedCount" : 1 }
+db.users.findOne({ name: "Maria" });
+/*
+{
+	"_id" : ObjectId("66bed0a429bb79f34a966a1c"),
+	"name" : "Maria",
+	"age" : 23,
+	"hobbies" : [
+		{
+			"title" : "Cooking",
+			"frequency" : 2
+		},
+		{
+			"title" : "Sports",
+			"frequency" : 2
+		},
+		{
+			"title" : "Hiking",
+			"frequency" : 2
+		}
+	],
+	"isSport" : false
+}
+*/
+//adding already exist element
+db.users.updateOne(
+  { name: "Maria" },
+  { $addToSet: { hobbies: { title: "Cooking", frequency: 2 } } }
+);
+// { "acknowledged" : true, "matchedCount" : 1, "modifiedCount" : 0 } //********************* */
+db.users.updateOne(
+  { name: "Maria" },
+  { $addToSet: { hobbies: { title: "Cooking", frequency: 1 } } }
+);
+// { "acknowledged" : true, "matchedCount" : 1, "modifiedCount" : 1 }
+db.users.findOne({ name: "Maria" });
+/*
+{
+	"_id" : ObjectId("66bed0a429bb79f34a966a1c"),
+	"name" : "Maria",
+	"age" : 23,
+	"hobbies" : [
+		{
+			"title" : "Cooking",
+			"frequency" : 2
+		},
+		{
+			"title" : "Sports",
+			"frequency" : 2
+		},
+		{
+			"title" : "Hiking",
+			"frequency" : 2
+		},
+		{
+			"title" : "Cooking",
+			"frequency" : 1
+		}
+	],
+	"isSport" : false
+}
+*/
+//some useful work using $addToSet operator
+db.users.insertOne({ name: "Steven", hobbies: ["Cooking", "Hiking"] }) >
+  // {
+  // 	"acknowledged" : true,
+  // 	"insertedId" : ObjectId("66c09b35b2cc291f1488dd83")
+  // }
+  // > // add a new hobby (e.g., "Swimming") to Maria's hobbies array, ensuring no duplicates:
+  // > // here no duplicates should be present in the document given in question
+  // > //we can add elements using $set, $push, $addToset, in the question he asked that no duplictes should be present
+  // > // so we have to use $addToSet operator to add specified element
+  db.users.updateOne(
+    { name: "Steven" },
+    { $addToSet: { hobbies: "Swimming" } }
+  );
+// { "acknowledged" : true, "matchedCount" : 1, "modifiedCount" : 1 }
+db.users.findOne({ name: "Steven" });
+/*
+{
+	"_id" : ObjectId("66c09b35b2cc291f1488dd83"),
+	"name" : "Steven",
+	"hobbies" : [
+		"Cooking",
+		"Hiking",
+		"Swimming"
+	]
+}
+*/
+db.users.updateOne({ name: "Steven" }, { $addToSet: { hobbies: "Cooking" } });
+// { "acknowledged" : true, "matchedCount" : 1, "modifiedCount" : 0 }
+// no modification was done because "Cooking" is already present
+// $addToSet with Documents
+db.users.updateOne(
+  { name: "Steven" },
+  { $addToSet: { hobbies: { title: "Running", frequency: 2 } } }
+);
+// { "acknowledged" : true, "matchedCount" : 1, "modifiedCount" : 1 }
+//$each with $addToSet
+db.users.updateOne(
+  { name: "Steven" },
+  { $addToSet: { hobbies: { $each: ["Swimming", "Dancing"] } } }
+);
+// { "acknowledged" : true, "matchedCount" : 1, "modifiedCount" : 1 }
+db.users.findOne({ name: "Steven" });
+
+/*
+{
+	"_id" : ObjectId("66c09b35b2cc291f1488dd83"),
+	"name" : "Steven",
+	"hobbies" : [
+		"Cooking",
+		"Hiking",
+		"Swimming",
+		{
+			"title" : "Running",
+			"frequency" : 2
+		},
+		"Dancing"
+	]
+}
+*/
+//only Dancing was added, and Swimming is not added because its already present
+// can we delet some fields in  the documents with deleteMany() and deleteOne() methods
