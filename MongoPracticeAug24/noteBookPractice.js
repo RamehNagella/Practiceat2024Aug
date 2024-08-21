@@ -4271,5 +4271,7 @@ db.users.findOne({ name: "Steven" });
 	]
 }
 */
-//only Dancing was added, and Swimming is not added because its already present
-// can we delet some fields in  the documents with deleteMany() and deleteOne() methods
+//only Dancing was added, and Swimming is not added because its
+// already present
+// can we delet some fields in  the documents with deleteMany()
+// and deleteOne() methods
