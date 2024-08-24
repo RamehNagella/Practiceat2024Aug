@@ -1,3 +1,4 @@
+/*
 console.log(typeof null);
 console.log(2037 - 1998);
 //object
@@ -1826,7 +1827,7 @@ exports.signup = async (req, res, next) => {
 */
 //PROMISES
 //promise is an object which is used to store the future responsse of the api result
-
+/*
 // The promises can be constructed using new Promise() keyword this keyword will again
 // take one call back function which in turn takes two aruguments
 // one for resolve, and reject
@@ -1937,3 +1938,24 @@ const main = async () => {
   }
 };
 main();
+*/
+console.log(new Date("2015-06-01"));
+//2015-06-01T00:00:00.000Z
+console.log(new Date("2013-06-24T00:00:00Z"));
+//2013-06-24T00:00:00.000Z
+console.log(Date.now());
+//1724377883839
+console.log(new Date(Date.now()));
+// 2024-08-23T01:52:08.876Z
+const date = Date.now(); //1699857388010
+const YyMmDd1 = new Date(Date.now()); //2023-11-13T06:29:34.077Z
+const YyMmDd = new Date(Date.now()).toISOString(); //2023-11-13T06:34:28.486Z
+const dateWithDay = new Date(Date.now()).toDateString(); //Mon Nov 13 2023
+const dateInJson = new Date(Date.now()).toJSON(); //2023-11-13T06:37:58.581Z
+
+const localDate = new Date(Date.now()).toLocaleDateString(); //11/13/2023
+const lclDtWthLclTime = new Date(Date.now()).toLocaleString(); //11/13/2023, 12:10:07 PM
+const localTiime = new Date(Date.now()).toLocaleTimeString(); //12:11:34 PM
+
+console.log(new Date(Date.now()).toDateString());
+console.log("new Date(Date.now()).toISOString()");
