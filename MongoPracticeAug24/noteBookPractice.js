@@ -3288,6 +3288,7 @@ db.users.find({}, { hobbies: 1 }).pretty();
 
 //BUT .$[] will work on all the objects if the condition is SATISFIED ON ONE OBJECT OF THE ARRAY
 //THEN .$[] OPEARATOR WILL WORK(update) ON ALL OBJECTS WITHIN THE ARRAY
+
 // Every element of the hobbies array in the matched documents will have hasGoodHealth set to true
 db.users.updateMany(
   { hobbies: { $elemMatch: { title: "Sports", frequency: { $in: [1, 2] } } } },
@@ -8357,3 +8358,399 @@ To merge the docs with target collection docs you need to use insertMany()
 or similar methods after retrieving the docs from the source.
 
 */
+///************************* NUMBERS ************************* */
+db.createCollection("numbers");
+//{ "ok" : 1 }
+// working with int32
+db.numbers.insertOne({ name: "Max", age: 29 });
+// {
+// 	"acknowledged" : true,
+// 	"insertedId" : ObjectId("66cfc709aa88a186f9fdf2ae")
+// }
+//find the size of the memorry after inserting the name and age>>
+// for this use db.collection().stats
+// db.numbers.stats;
+//>>>>>>>>>. which  is wrong
+db.numbers.stats();
+// {
+// 	"ns" : "practice.numbers",
+// 	"size" : 49,
+// 	"count" : 1,
+// 	"avgObjSize" : 49,
+// 	"numOrphanDocs" : 0,
+// 	"storageSize" : 20480,
+// 	"freeStorageSize" : 0,
+// 	"capped" : false,}
+// size is 42 that is without Int32
+//Now create document with Int32
+db.numbers.deleteMany({});
+// { "acknowledged" : true, "deletedCount" : 1 }
+//creating user with int32
+db.numbers.insertOne({ name: "Max", age: NumberInt(29) });
+// {
+// 	"acknowledged" : true,
+// 	"insertedId" : ObjectId("66cfc8e9aa88a186f9fdf2af")
+// }
+db.numbers.findOne();
+// { "_id" : ObjectId("66cfc8e9aa88a186f9fdf2af"),
+// "name" : "Max",
+// "age" : 29
+// }
+//check size
+db.numbers.stats();
+// {
+// "ns" : "practice.numbers",
+// "size" : 45,
+// "count" : 1,
+// "avgObjSize" : 45,
+// "numOrphanDocs" : 0,
+// 	"storageSize" : 24576,
+// "freeStorageSize" : 4096,
+// "capped" : false,
+// "wiredTiger" : {
+//   "metadata" : {
+//     "formatVersion" : 1
+//   },
+
+// size decreased
+// size decreased is you observe above results the size taken to store
+// the number is taken 49 without  Int32, and with Int32 it is taken 45.
+//  But with Int32 storageSize is 24576 which is more than number storage
+//  without Int32 (storageSize:20480). why it is like that? actually the
+//  storage size has to be low for storing a number with Int32 storage rigth?
+
+/*
+The behavior  is related to how mongonDB manages the storage at the collection
+level, not just at the document level.
+1.Document Size vs. Storage Size:
+
+The document size refers to the actual size of the BSON document stored in
+ MongoDB, which decreases when you use NumberInt(29) instead of a regular
+number because NumberInt is a 4-byte integer, while a regular number (which
+is stored as a double in BSON) takes 8 bytes.
+
+The storage size, on the other hand, refers to the amount of disk space
+allocated by MongoDB for storing the collection's data. This is not a
+simple sum of all document sizes; it includes padding, space for indexes,
+ and other internal overhead.
+
+2.Why the Storage Size Increased:
+
+Padding Factor: When you insert a document, MongoDB may allocate additional space in
+ anticipation of future document growth, especially in non-capped collections. 
+ This is known as a padding factor.
+
+WiredTiger Storage Engine: If you're using the WiredTiger storage engine,
+ it manages data in chunks called "extents," and it might allocate space in
+  larger chunks as the collection grows, regardless of the actual document 
+  sizes. The storage engine might also reserve space for internal data structures 
+  and handling of potential updates.
+
+ Why Document Size Decreased but Storage Size Increased:
+
+The reduction in document size due to using NumberInt doesn’t necessarily
+ lead to a reduction in the overall storage size, because storage size 
+ accounts for more than just the raw document data. Other factors like 
+ preallocated space and the behavior of the storage engine influence it.
+  When documents are smaller, MongoDB might still allocate the same or 
+  even more space at the collection level, leading to what you observed.
+
+  In summary, even though the document size decreased when you used NumberInt,
+   the storage size might have increased due to the way MongoDB allocates
+    and manages storage at the collection level, not just based on
+     individual document sizes.
+     */
+
+//WORKING WITH NUMBER INT 64 *****************************************
+db.numbers.insertOne({ name: "Max", valuation: NumberInt("5000000000") });
+// {
+// "acknowledged" : true,
+// "insertedId" : ObjectId("66cfda13aa88a186f9fdf2b2")
+// }
+db.numbers.find();
+// { "_id" : ObjectId("66cfda13aa88a186f9fdf2b2"), "name" : "Max", "valuation" : 705032704 }
+db.numbers.insertMany([
+  { name: "withString", valuation: "5000000000" },
+  { name: "normalInsert", valuation: 5000000000 }
+]);
+// {
+// 	"acknowledged" : true,
+// 	"insertedIds" : [
+// 		ObjectId("66cfda7aaa88a186f9fdf2b3"),
+// 		ObjectId("66cfda7aaa88a186f9fdf2b4")
+// 	]
+// }
+db.numbers.find()[
+  ({
+    _id: ObjectId("66cfda13aa88a186f9fdf2b2"),
+    name: "Max",
+    valuation: 705032704
+  },
+  {
+    _id: ObjectId("66cfda7aaa88a186f9fdf2b3"),
+    name: "withString",
+    valuation: "5000000000"
+  },
+  {
+    _id: ObjectId("66cfda7aaa88a186f9fdf2b4"),
+    name: "normalInsert",
+    valuation: 5000000000
+  })
+];
+
+// IF U INSERT AN INTEGER WITHOUT SPECIFYING ITS TYPE, MONGODB WILL STORE
+// IT AS A DOUBLE BY DEFAULT **************************
+
+//To explisitely storean inter as int32 or int64 u can use NumberInt() for int32
+// or NumberLong() for int64
+
+//because of that reason only the last integer is storing without any combursome
+//if u store a number with string then we can store it for any long integer but
+// we cannot do any mathematical operations on that numbers
+
+// But,
+// if yuo observe  for number we were stored with int32 bit integer
+//actual storage number NumberInt("5000 0000 000") but it is storing as 705032704(whcih is random or garbage value)
+// this is because the maximum value of int32 bit is
+/*
+1. int32
+Maximum value: 2,147,483,647 (2^31 - 1)
+Minimum value: -2,147,483,648 (-2^31)
+
+2. int64
+Maximum value: 9,223,372,036,854,775,807 (2^63 - 1)
+Minimum value: -9,223,372,036,854,775,808 (-2^63)
+
+3. double (64-bit)
+Maximum value: Approximately 1.7976931348623157 × 10^308
+Minimum value: Approximately -1.7976931348623157 × 10^308
+Smallest positive value: Approximately 4.9406564584124654 × 10^-324
+
+4. double (128-bit) (Quadruple-precision floating point)
+Maximum value: Approximately 1.18973149535723176508575932662800702 × 10^4932
+Minimum value: Approximately -1.18973149535723176508575932662800702 × 10^4932
+Smallest positive value: Approximately 3.36210314311209350626267781732175260 × 10^-4932
+
+Notes:
+int32 and int64 are used for integers, with specific bit lengths 
+determining their ranges.
+
+double (64-bit) is a common floating-point format in most programming 
+    languages, including MongoDB for storing numbers by default.
+double (128-bit) is not typically used in MongoDB but is used in 
+    certain specialized applications where higher precision is required 
+*/
+//inserting with int64(Long);
+db.numbers.insertMany([
+  { name: "with Int32", number: NumberInt("5000000000") },
+  { name: "with Int64", number: NumberLong("5000000000") }
+]);
+//  {
+//    "acknowledged" : true,
+//    "insertedIds" : [
+//      ObjectId("66cfdec1aa88a186f9fdf2b6"),
+//      ObjectId("66cfdec1aa88a186f9fdf2b7")
+//    ]
+//  }
+db.numbers.find()[
+  ({
+    _id: ObjectId("66cfdec1aa88a186f9fdf2b6"),
+    name: "with Int32",
+    number: 705032704
+  },
+  {
+    _id: ObjectId("66cfdec1aa88a186f9fdf2b7"),
+    name: "with Int64",
+    number: NumberLong("5000000000")
+  })
+];
+
+//now insert a highest posible int32 number
+db.numbers.insertOne({
+  name: "highest possible int32 number",
+  number: NumberInt("2147483647")
+});
+// {
+// 	"acknowledged" : true,
+// 	"insertedId" : ObjectId("66cfe04eaa88a186f9fdf2b9")
+// }
+db.numbers.find()[
+  {
+    _id: ObjectId("66cfe04eaa88a186f9fdf2b9"),
+    name: "highest possible int32 number",
+    number: 2147483647
+  }
+];
+//now add a number which is more than int32 maximum number
+db.numbers.insertOne({
+  name: "number More than int32",
+  number: NumberInt("2147483648")
+});
+// {
+// 	"acknowledged" : true,
+// 	"insertedId" : ObjectId("66cfe0bfaa88a186f9fdf2ba")
+// }
+db.numbers.find()[
+  ({
+    _id: ObjectId("66cfe04eaa88a186f9fdf2b9"),
+    name: "highest possible int32 number",
+    number: 2147483647
+  },
+  {
+    _id: ObjectId("66cfe0bfaa88a186f9fdf2ba"),
+    name: "number More than int32",
+    number: -2147483648
+  })
+];
+//if we increase the number which is more than maximum value, then it traveses to the negative value
+
+//hence storing a bigger value is not good using int32 bit
+db.numbers.insertOne({
+  name: "store with int64",
+  number: NumberLong("2147483648")
+});
+// {
+// 	"acknowledged" : true,
+// 	"insertedId" : ObjectId("66cfe2f6aa88a186f9fdf2bb")
+// }
+
+//NOW STORE THE NUMBER int32
+db.numbers.find();
+// { "_id" : ObjectId("66cfe04eaa88a186f9fdf2b9"), "name" : "highest possible int32 number", "number" : 2147483647 }
+// { "_id" : ObjectId("66cfe0bfaa88a186f9fdf2ba"), "name" : "number More than int32", "number" : -2147483648 }
+// { "_id" : ObjectId("66cfe2f6aa88a186f9fdf2bb"), "name" : "store with int64", "number" : NumberLong("2147483648") }
+//the number is stored as it is as we inserted using int 64
+db.numbers.insertOne({
+  name: "maximum int64 integer",
+  number: NumberLong(9223372036854775807)
+});
+// 2024-08-29T08:31:42.362+0530 E QUERY    [thread1] Error: number passed to NumberLong must be representable as an int64_t :
+// got error eventhough the number is in the accepted range,
+//The problem is that this provided number is too big becase its a double
+// so to store without any error wrapped this number quotations
+db.numbers.insertOne({
+  name: "maximum int64 integer",
+  number: NumberLong("9223372036854775807")
+});
+// {
+// 	"acknowledged" : true,
+// 	"insertedId" : ObjectId("66cfe45daa88a186f9fdf2bd")
+// }
+db.numbers.find()[
+  ({
+    _id: ObjectId("66cfe04eaa88a186f9fdf2b9"),
+    name: "highest possible int32 number",
+    number: 2147483647
+  },
+  {
+    _id: ObjectId("66cfe0bfaa88a186f9fdf2ba"),
+    name: "number More than int32",
+    number: -2147483648
+  },
+  {
+    _id: ObjectId("66cfe2f6aa88a186f9fdf2bb"),
+    name: "store with int64",
+    number: NumberLong("2147483648")
+  },
+  {
+    _id: ObjectId("66cfe45daa88a186f9fdf2bd"),
+    name: "maximum int64 integer",
+    number: NumberLong("9223372036854775807")
+  })
+];
+
+// DOING MATHS WITH FLOATS INT32 AND INT64
+
+db.numbers.insertOne({ name: "Max", account: "49718979795729875445452" });
+// {
+// 	"acknowledged" : true,
+// 	"insertedId" : ObjectId("66cfe7f6aa88a186f9fdf2be")
+// }
+db.numbers.find();
+// { "_id" : ObjectId("66cfe7f6aa88a186f9fdf2be"), "name" : "Max", "account" : "49718979795729875445452" }
+
+//storing a number like a string(i.e using "" marks) we can store as much
+// bigger as we can, but WE CANNOT DO MATHEMATICAL CALCULATIONS ON IT
+//for exxample
+db.numbers.insertOne({ name: "Max", money: "10" });
+// {
+// 	"acknowledged" : true,
+// 	"insertedId" : ObjectId("66cfe8e0aa88a186f9fdf2bf")
+// }
+// now increase the money of max by 5 rupees
+db.numbers.updateOne({ name: "Max" }, { $inc: { money: 5 } });
+// 2024-08-29T08:51:28.288+0530 E QUERY    [thread1] WriteError: Cannot apply $inc to a value of non-numeric type. {_id: ObjectId('66cfe8e0aa88a186f9fdf2bf')} has the field 'money' of non-numeric type string :
+// WriteError({
+// 	"index" : 0,
+// 	"code" : 14,
+// 	"errmsg" : "Cannot apply $inc to a value of non-numeric type. {_id: ObjectId('66cfe8e0aa88a186f9fdf2bf')} has the field 'money' of non-numeric type string",
+// 	"op" : {
+// 		"q" : {
+// 			"name" : "Max"
+// 		},
+// 		"u" : {
+// 			"$inc" : {
+// 				"money" : 5
+// 			}
+// 		},
+// 		"multi" : false,
+// 		"upsert" : false
+// 	}
+// })
+db.numbers.insertOne({ name: "Max", account: 10 });
+// {
+// 	"acknowledged" : true,
+// 	"insertedId" : ObjectId("66cfe9e3aa88a186f9fdf2c0")
+// }
+//increase account by 10
+db.numbers.updateOne({ name: "Max" }, { $inc: { account: 5 } });
+// { "acknowledged" : true, "matchedCount" : 1, "modifiedCount" : 1 }
+db.numbers.find();
+// { "_id" : ObjectId("66cfe9e3aa88a186f9fdf2c0"), "name" : "Max", "account" : 15 }
+// operations we can made
+
+db.numbers.insertOne({ a: 0.3, b: 0.1 });
+// {
+// 	"acknowledged" : true,
+// 	"insertedId" : ObjectId("66cfecd8aa88a186f9fdf2c2")
+// }
+db.numbers.find();
+// { "_id" : ObjectId("66cfecd8aa88a186f9fdf2c2"), "a" : 0.3, "b" : 0.1 }
+
+db.numbers.aggregate([{ $project: { result: { $subtract: ["$a", "$b"] } } }])[
+  { _id: ObjectId("66cfecd8aa88a186f9fdf2c2"), result: 0.19999999999999998 }
+];
+//actual result a-b is 0.2 but it resluted another value
+// The issue you're encountering is due to how floating-point arithmetic works
+//  in most programming languages and databases, including MongoDB.
+// Although MongoDB uses 64-bit double precision to store numbers, this does 
+// not guarantee exact precision for all decimal numbers.
+
+db.numbers.aggregate([{$project:{result:{$sum:["$a", "$b"]}}}])
+// { "_id" : ObjectId("66cfecd8aa88a186f9fdf2c2"), "result" : 0.4 }
+//
+
+/// WORKING WITH DCIMAL 128 BIT
+
+//insert a number that will use high precision double
+db.numbers.insertOne({ a: NumberDecimal("0.3"), b: NumberDecimal("0.1") });
+// {
+// 	"acknowledged" : true,
+// 	"insertedId" : ObjectId("66cfeb45aa88a186f9fdf2c1")
+// }
+db.numbers.find().pretty();
+// {
+// 	"_id" : ObjectId("66cfeb45aa88a186f9fdf2c1"),
+// 	"a" : NumberDecimal("0.3"),
+// 	"b" : NumberDecimal("0.1")
+// }
+db.numbers
+  .aggregate([{ $project: { result: { $subtract: ["$a", "$b"] } } }])
+  .pretty();
+// {
+// 	"_id" : ObjectId("66cfeb45aa88a186f9fdf2c1"),
+// 	"result" : NumberDecimal("0.2")
+// }
+/// here we got exact number decimal value
+// Now if we want this for Long and integer we can use NumberDecimal for all
+// kind of  operations

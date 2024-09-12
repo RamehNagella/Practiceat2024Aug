@@ -838,8 +838,9 @@ function flippingBits(n) {
   // console.log(appendBits, typeof appendBits);
   // const binaryNum32Format = binaryNumber.padStart(appendBits, "0");
   // console.log(binaryNum32Format);    **************** that is wrong approch
-  const binaryIn32Bit = binaryNumber.padStart(32, 0);
-  // console.log("3232bi", binaryIn32Bit);
+  const binaryIn32Bit = binaryNumber.padStart(32, 0); //32 is totalLength of the padding, and 0 is number to be used for pad
+  console.log("3232bi", binaryIn32Bit); //3232bi 00000000000000000000000000001101
+
   const arrOf32bit = [...binaryIn32Bit];
   // console.log("3232arr", arrOf32bit);
   const flipBitsArr = arrOf32bit.map((el) =>
@@ -847,7 +848,9 @@ function flippingBits(n) {
   );
   // console.log("flipBb", flipBitsArr);
   const flipBitsInString = flipBitsArr.join("");
-  // console.log("flipStr ", flipBitsInString);
+  console.log("flipStr ", flipBitsInString); //flipStr  11111111111111111111111111110010
+
+  //converrting binary to decimal using parseInt operator;
   const requiredOutput = parseInt(flipBitsInString, 2);
   return requiredOutput;
 }
@@ -964,7 +967,8 @@ console.log(
 //second row( index value is 1) && column:1(3-1-1(1st row) = 1) matrix[1][1]
 //third row (index value is 2) && column :0(3-1-2(3rd row) = 0) matrix[3][0]
 // (3-1-0(0th row) = 2)
-// in the above calculation 3 is length of the row or length of the matrix, 1 is standard value and
+// in the above calculation 3 is length of the row or length of the matrix,
+//                          1 is standard value and
 // the last decresing nmber are current calculating number (ex: 0,1,2,3,.. )
 //HNCE THIS IS THE CRITERIA TO FIND THE ELEMENTS IN THE BACKWARD DIAGONAL ELEMENTS
 //programmatically
@@ -1008,7 +1012,9 @@ function diagonalDifference(arr) {
 }
 console.log("mm", matrix);
 console.log(diagonalDifference(matrix));
-// mm [ [ 11, 2, -3 ], [ 4, 5, 6 ], [ 7, 8, 9 ] ]
+// mm [ [ 11, 2, -3 ],
+//    [ 4, 5, 6 ],
+//    [ 7, 8, 9 ] ]
 // 16
 // or
 
@@ -1105,7 +1111,7 @@ int[100]: a frequency array
 function countingSort(arr) {
   // Write your code here
   let frequencyArray = new Array(100).fill(0);
-
+  console.log("fff", frequencyArray.length);
   // Iterate through the input array
   for (let i = 0; i < arr.length; i++) {
     // Increment the value at the index corresponding to the element in arr
@@ -1381,8 +1387,8 @@ function countingValleys1(steps, path) {
   }
   return valleys;
 }
-console.log(countingValleys1(10, "UUDDDUDUDD"));
-
+console.log("cv", countingValleys1(10, "UUDDDUDUDD"));
+//2
 //
 
 ///
@@ -1551,3 +1557,555 @@ console.log(
   isPangram("We promptly judged antique ivory buckles for the next prize")
 );
 console.log(isPangram("qmExzBIJmdELxyOFWv LOCmefk TwPhargKSPEqSxzveiun"));
+/*
+Given an array of integers and a positive integer k, determine the number 
+of (i,k)  pairs where i<j and ar[i] + ar[j] is divisible by k.
+
+Example
+
+ar =[1,2,3,4,5,6];
+k=5;
+
+
+Three pairs meet the criteria:[1,4],[2,3]  and[4,6] .
+
+Function Description
+
+Complete the divisibleSumPairs function in the editor below.
+
+divisibleSumPairs has the following parameter(s):
+
+int n: the length of array 
+int ar[n]: an array of integers
+int k: the integer divisor
+
+Returns
+- int: the number of pairs
+
+Input Format:
+
+The first line contains  space-separated integers,  and .
+The second line contains  space-separated integers, each a value of arr[i].
+
+Constraints
+
+Sample Input
+*/
+function divisibleSumPairs(n, k, ar) {
+  let count = 0;
+  for (let i = 0; i < ar.length; i++) {
+    for (let j = i + 1; j < ar.length; j++) {
+      if ((ar[i] + ar[j]) % k === 0) {
+        count++;
+      }
+    }
+  }
+  return count;
+}
+ar = [1, 2, 3, 4, 5, 6];
+k = 3;
+n = 6;
+console.log("//////>>", divisibleSumPairs(n, k, ar));
+//5
+
+//
+
+//
+
+function birthday(s, d, m) {
+  // Write your code here
+  console.log(s, "\n", d, "\n", m);
+
+  // [ 1, 2, 1, 3, 2 ] >>>. sides of square
+  //  3    >>>>>>>>>>>>>. Ron's birthday
+  //  2    >>>>>>>>>>>>> Ron's birth Month
+  // [1,2],[2,1]>>>>>> posibble ways
+  let outputArr = [];
+  for (let i = 0; i < s.length - 1; i++) {
+    for (let j = i + 1; j < s.length; j++) {
+      if (j > s.length) {
+        break;
+      }
+
+      let sumOfsides = s[i] + s[j] === d ? true : false;
+      let length = s[i] === m || s[j] === m ? true : false;
+      let adjescent = j - i === 1 ? true : false;
+
+      if (length && sumOfsides && adjescent) {
+        console.log("we can devide");
+        outputArr.push([s[i], s[j]]);
+      }
+    }
+  }
+  console.log(outputArr);
+  return outputArr.length;
+}
+/*
+this is the code i have then how can i make it for different lengths of array, and different values of d and m
+
+ChatGPT said:
+ChatGPT
+To generalize your function birthday for different lengths of arrays and different values of d and m, we can consider the following adjustments:
+
+Problem Restatement:
+s: Array of integers representing the values of each square segment.
+d: Target sum of the segment values.
+m: Length of the subarray (the number of segments you are looking for).
+The goal is to find how many ways you can select m consecutive elements from the array s that add up to d.
+
+Approach:
+Sliding Window Technique: Use a sliding window of size m to check consecutive elements.
+Sum Check: For each subarray of size m, check if the sum equals d.
+Multiple Lengths: Handle different lengths by adjusting the sliding window size.
+Code Implementation:
+Here’s a refactored version of your function:
+*/
+function birthday(s, d, m) {
+  let outputArr = [];
+
+  for (let i = 0; i <= s.length - m; i++) {
+    // Sliding window: sum of m consecutive elements starting from i
+    let subArray = s.slice(i, i + m);
+    let sum = subArray.reduce((acc, val) => acc + val, 0);
+
+    if (sum === d) {
+      outputArr.push(subArray);
+    }
+  }
+
+  console.log(outputArr);
+  return outputArr.length;
+}
+
+/*
+// Example usage:
+let s = [1, 2, 1, 3, 2];
+let d = 3;  // Target sum
+let m = 2;  // Length of subarray
+
+console.log(birthday(s, d, m)); // Output: 2
+Explanation:
+Sliding Window: The loop iterates from 0 to s.length - m, ensuring the subarray doesn’t exceed the bounds of the array.
+
+Subarray and Sum: For each position i, a subarray of length m is created using slice(i, i + m). The sum of this subarray is calculated using reduce.
+
+Condition Check: If the sum matches d, the subarray is stored in outputArr.
+
+Result: The function returns the length of outputArr, representing the number of valid subarrays.
+
+Example:
+Given s = [1, 2, 1, 3, 2], d = 3, and m = 2:
+
+The subarrays of length 2 are [1, 2], [2, 1], [1, 3], and [3, 2].
+The valid subarrays with a sum of 3 are [1, 2] and [2, 1].
+The function returns 2.
+This solution is flexible and will handle different values for d, m, and arrays of varying lengths.
+*/
+/*
+where is the difference between priviously written code and above chat gpt printed code
+
+ChatGPT said:
+ChatGPT
+Let's compare the two versions to understand the differences:
+
+Your Original Code:
+javascript
+Copy code
+function birthday(s, d, m) {
+    let outputArr = [];
+    for(let i = 0; i < s.length - 1; i++) {
+        for(let j = i + 1; j < s.length; j++) {
+            
+            if(j > s.length) {
+                break;
+            }
+
+            let sumOfsides = s[i] + s[j] === d ? true : false;
+            let length = (s[i] === m) || (s[j] === m) ? true : false;
+            let adjescent = j - i === 1 ? true : false;
+            
+            if(length && sumOfsides && adjescent) {
+                console.log("we can divide");
+                outputArr.push([s[i], s[j]]);
+            }
+        }
+    }
+    console.log(outputArr);
+    return outputArr.length;
+}
+Refactored Code:
+javascript
+Copy code
+function birthday(s, d, m) {
+    let outputArr = [];
+    
+    for (let i = 0; i <= s.length - m; i++) { 
+        // Sliding window: sum of m consecutive elements starting from i
+        let subArray = s.slice(i, i + m);
+        let sum = subArray.reduce((acc, val) => acc + val, 0);
+        
+        if (sum === d) {
+            outputArr.push(subArray);
+        }
+    }
+    
+    console.log(outputArr);
+    return outputArr.length;
+}
+Key Differences:
+Sliding Window Approach:
+
+Original Code: You used two nested loops to check pairs of elements (s[i] and s[j]) and their sum, specifically focusing on pairs of elements with adjacent indices.
+Refactored Code: The sliding window approach uses a single loop to create subarrays of size m directly and checks if their sum matches d.
+Sum Calculation:
+
+Original Code: You checked the sum of exactly two elements (s[i] + s[j]) and compared it with d.
+Refactored Code: The refactored version generalizes this by calculating the sum of m consecutive elements, which makes it more flexible for varying subarray lengths (m).
+Condition on Length:
+
+Original Code: You checked if one of the elements (s[i] or s[j]) was equal to m and also ensured that j - i === 1 (elements were adjacent).
+Refactored Code: There is no such check because the sliding window inherently handles consecutive elements. The length variable is no longer needed since the window size is defined by m.
+Handling Subarrays:
+
+Original Code: You were pushing pairs of elements (s[i] and s[j]) into outputArr.
+Refactored Code: The entire subarray is pushed into outputArr, not just pairs. This makes the solution general for any subarray length m.
+Generalization:
+
+Original Code: The solution was tailored specifically for pairs of adjacent elements.
+Refactored Code: The solution is generalized for any subarray length m, making it more flexible for different problem constraints.
+Conclusion:
+The refactored code is more flexible, scalable, and easier to adapt to different problem constraints because it uses a sliding window approach rather than focusing on pairs of elements. It eliminates the need for nested loops and makes the logic clearer and more general for varying values of m.
+
+*/
+/*
+In this challenge, the task is to debug the existing code to successfully execute all provided test files.
+
+Given two strings consisting of digits 0 and 1 only, find the XOR of the two strings.
+
+To know more about XOR Click Here
+
+Debug the given function strings_xor to find the XOR of the two given strings appropriately.
+
+Note: You can modify at most three lines in the given code and you cannot add or remove lines to the code.
+
+To restore the original code, click on the icon to the right of the language selector.
+
+Input Format
+
+The input consists of two lines. The first line of the input contains the first string, , and the second line contains the second string, .
+
+Constraints
+
+Output Format
+
+Print the string obtained by the XOR of the two input strings in a single line.
+
+Sample Input
+
+10101
+00101
+Sample Output
+
+10000
+Explanation
+
+The XOR of the two strings 10101 and 00101 is 
+10000 . for this question write a code here process.stdin.on("end", function () {
+    // now we can read/parse input
+}
+*/
+// my code is
+function exOrOperation(input) {
+  // now we can read/parse input
+  console.log(input);
+  const inputArr = input;
+  // console.log(inputArr);//[ '10101', '00101' ]
+
+  const arrays = inputArr.map((el, i, arr) => {
+    return [...el];
+  });
+  console.log(arrays);
+  if (arrays.length < 2) {
+    console.log("Invalid input, requires at least two binary  strings.");
+    return;
+  }
+
+  let arr1 = arrays[0];
+  let arr2 = arrays[1];
+  if (arrays.length - 1 === 2) {
+    let arr3 = arrays[2];
+  }
+
+  console.log(arr1, arr2);
+
+  let output = [];
+  for (let i = 0; i < arr1.length; i++) {
+    if (Number(arr1[i]) === 0 && Number(arr2[i]) === 1) {
+      output.push(1);
+    } else if (Number(arr1[i]) === 1 && Number(arr2[i]) === 0) {
+      output.push(1);
+    } else {
+      output.push(0);
+    }
+  }
+  let reqOutput = output.join("");
+  console.log(reqOutput);
+
+  return reqOutput;
+}
+console.log(exOrOperation(["10101", "00101"]));
+console.log(">>>", exOrOperation(["10101", "10101"]));
+console.log(">33", exOrOperation(["00101", "10111"]));
+// console is
+// 10101
+// 00101
+// [ [ '1', '0', '1', '0', '1' ], [ '0', '0', '1', '0', '1' ] ]
+// [ '1', '0', '1', '0', '1' ] [ '0', '0', '1', '0', '1' ]
+// 10000
+// >>> 00000
+// >33 10010
+//  for multiple lines
+function exOrOperationMul(input) {
+  // Log the input to see what we're working with
+  console.log(input);
+
+  // Convert each string in the input array to an array of characters
+  const arrays = input.map((el) => [...el]);
+  console.log("aa", arrays);
+
+  // Check if we have at least two binary strings
+  if (arrays.length < 2) {
+    console.log("Invalid input, requires at least two binary strings.");
+    return;
+  }
+
+  // Initialize the result with the first binary string
+  let result = arrays[0];
+
+  // Loop through the remaining arrays and XOR each with the result
+  for (let i = 1; i < arrays.length; i++) {
+    let currentArr = arrays[i];
+    let tempResult = [];
+
+    for (let j = 0; j < result.length; j++) {
+      // XOR operation: if bits are the same, push 0; if different, push 1
+      tempResult.push(Number(result[j]) === Number(currentArr[j]) ? "0" : "1");
+    }
+
+    // Update the result with the XOR of the current array
+    result = tempResult;
+  }
+
+  // Join the array back into a string
+  let reqOutput = result.join("");
+  console.log(reqOutput);
+
+  return reqOutput;
+}
+
+// Test the function with multiple binary strings
+console.log("//", exOrOperationMul(["10101", "00101", "11111"])); // Output will be XOR of all three strings
+// 01111
+console.log("//>>", exOrOperationMul(["10101", "00101", "11111", "01010"])); // Output will be XOR of all three strings
+//>> 00101
+
+//writing EX-NOR operation
+
+function exNorOPeration(input) {
+  console.log("input", input);
+  let inputArrays = input.map((arr) => [...arr]);
+
+  // console.log("////", inputArrays);
+  //check input arrays are greater than 2 or not for posible operation
+
+  if (inputArrays.length < 2) {
+    return "operation is not possible, requires atleast two binary strings.";
+  }
+
+  let result = inputArrays[0];
+  // console.log("333", result);
+
+  for (let i = 1; i < inputArrays.length; i++) {
+    let tempResult = [];
+    let operatingArr = inputArrays[i];
+    // console.log("444", operatingArr);
+
+    for (let j = 0; j < result.length; j++) {
+      // if (Number(result[j]) === Number(operatingArr[j])) {
+      //   tempResult.push(1);
+      // } else {
+      //   tempResult.push(0);
+      // }
+      tempResult.push(
+        Number(result[j]) === Number(operatingArr[j]) ? "1" : "0"
+      );
+    }
+    result = tempResult;
+  }
+  // console.log("rr", result);
+  return result;
+}
+console.log("nn1", exNorOPeration(["100101", "110111"]));
+console.log("nn2", exNorOPeration(["10101", "00101", "11111"]));
+// input [ '100101', '110111' ]
+// nn1 [ 1, 0, 1, 1, 0, 1 ]
+// input [ '10101', '00101', '11111' ]
+// nn2 [ 0, 1, 1, 1, 1 ]
+
+/*
+There are two -element arrays of integers, A  and B . Permute them 
+into some A' and B'  such that the relation A'[i] + B'[i] >= k  holds for
+ all i where 0<=i<n .
+
+There will be  queries consisting of A,B , and k. For each query,
+ return YES if some permutation A',B'  satisfying the relation 
+ exists. Otherwise, return NO.
+
+Example
+ 
+A = [0,1];
+B= [0,2]
+
+
+A valid A', B'is A' =[1,0]   and : B' =[0,2] 1+0>=1 and 0+2>=1. 
+Return YES.
+
+Function Description
+
+Complete the twoArrays function in the editor below. It should
+ return a string, either YES or NO.
+ parameter(s):
+
+int k: an integer
+int A[n]: an array of integers
+int B[n]: an array of integers
+Returns
+- string: either YES or NO
+
+Input Format
+
+The first line contains an integer q, the number of queries.
+
+The next q sets of 3 lines are as follows:
+
+The first line contains two space-separated integers n and  k, 
+the size of both arrays A and B, and the relation variable.
+The second line contains n space-separated integers A[i] .
+The third line contains n space-separated integers B[i].
+
+Sample Input
+
+STDIN       Function
+-----       --------
+2           q = 2
+3 10        A[] and B[] size n = 3, k = 10
+2 1 3       A = [2, 1, 3]
+7 8 9       B = [7, 8, 9]
+4 5         A[] and B[] size n = 4, k = 5
+1 2 2 1     A = [1, 2, 2, 1]
+3 3 3 4     B = [3, 3, 3, 4]
+
+*/
+//this funcitons are correct for not permuted queries.
+//but in the question convert the arrays into permuted array and
+// then do the operation
+
+function twoArrays(k, A, B) {
+  console.log(k, A, B);
+  if (k < 0) {
+    return "Invalid k value";
+  }
+  for (i = 0; i < A.length; i++) {
+    return A[i] + B[i] >= k ? "YES" : "NO";
+  }
+}
+console.log(twoArrays(10, [2, 1, 3], [7, 8, 9]));
+console.log(twoArrays(15, [2, 1, 3], [7, 8, 9]));
+console.log(twoArrays(1, [2, 1, 3], [7, 8, 9]));
+
+// 10 [ 2, 1, 3 ] [ 7, 8, 9 ]
+// NO
+// 15 [ 2, 1, 3 ] [ 7, 8, 9 ]
+// NO
+// 1 [ 2, 1, 3 ] [ 7, 8, 9 ]
+// YES
+
+function processInput(input) {
+  console.log("////", input);
+  const lines = input.trim().split("\n");
+  let result = [];
+
+  for (let i = 0; i < lines.length; i += 3) {
+    const [n, k] = lines[i].split(" ").map(Number);
+    const A = lines[i + 1].split(" ").map(Number);
+    const B = lines[i + 2].split(" ").map(Number);
+
+    result.push(twoArrays(k, A, B));
+    // result.push(twoArraysPerm(k, A, B));
+  }
+  return result;
+}
+
+const input = `
+5 10
+7 6 8 4 2
+5 2 6 3 1
+3 10
+2 1 3
+7 8 9
+4 5
+1 2 2 1
+3 3 3 4
+`;
+console.log("///>>", processInput(input)); //using twoArrays function
+///>> [ 'YES', 'NO', 'NO' ]
+console.log("perm", processInput(input)); //using twoArraysPerm function for the same input;
+//perm [ 'NO', 'YES', 'NO' ]
+const input2 = `
+3 10
+2 1 3
+7 8 9
+4 5
+1 2 2 1
+3 3 3 4
+`;
+// console.log("22>", processInput(input2));
+
+//now write the same function for permutedArray;
+
+// Permuted means changing the position of the elements of the Array
+// if you given two arrays both array elements position should not be change in same order
+// one should be ascending other should be descending.
+
+function twoArraysPerm(k, A, B) {
+  if (k < 0) return "Invalid value of k";
+
+  const C = A.sort((a, b) => a - b);
+  const D = B.sort((a, b) => b - a);
+
+  for (let i = 0; i < C.length; i++) {
+    if (C[i] + D[i] < k) {
+      return "NO";
+    }
+  }
+  return "YES";
+}
+const twoInput = `
+
+10
+[7 6 8 4 2]
+[5 2 6 3 1]
+`;
+// console.log(twoArraysPerm(15, [2, 1, 3], [7, 8, 9]));
+// console.log(twoArraysPerm(10, [7, 6, 8, 4, 2], [5, 2, 6, 3, 1]));
+// console.log("/////", twoArraysPerm(5, [1, 2, 2, 1], [3, 3, 3, 4]));
+//twoArraysPerm ouput
+// NO;
+// NO;
+// NO;
+
+///// NO
+// twoArrays fn ouput
+// NO;
+// NO;
+// YES;

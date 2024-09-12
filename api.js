@@ -24,7 +24,8 @@ cubeArr(arr).then((res) => {
   console.log("handling with then-catch:", res);
 });
 */
-// const cubeArrResult = await cubeArr(arr);//SyntaxError: await is only valid in async functions and the top level bodies of modules
+// const cubeArrResult = await cubeArr(arr);
+//SyntaxError: await is only valid in async functions and the top level bodies of modules
 // console.log(cubeArrResult);
 
 // 23
@@ -75,12 +76,14 @@ cubeArr(arr).then((result) => {
 
 //ASYNCHRONOUS CODE
 console.log("1.", "outside async code");
+
 setTimeout(() => {
   console.log(
     "2.",
     "inside async code in setTimeout function with 1500ms timout."
   );
 }, 1500);
+
 console.log("3.", "after async code");
 
 // 1. outside async code
@@ -89,7 +92,7 @@ console.log("3.", "after async code");
 
 const promise1 = new Promise(function (resolve) {
   setTimeout(() => {
-    console.log("4.", "async code but inside promise with timout");
+    console.log("4.", "async code but inside promise with timeout");
     resolve("from inside promise");
   }, 1000);
 });
