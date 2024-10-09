@@ -2109,3 +2109,493 @@ const twoInput = `
 // NO;
 // NO;
 // YES;
+
+//
+
+//
+
+/*
+There is a large pile of socks that must be paired by color. Given an array of integers representing the color of each sock, determine how many pairs of socks with matching colors there are.
+
+Example
+n= 7 
+ar = [1,2,1,2,1,3,2]
+There is one pair of color 1 and one of color 2 . There are three odd socks left, one of each color. The number of pairs is 2 .
+
+Function Description
+
+Complete the sockMerchant function in the editor below.
+
+sockMerchant has the following parameter(s):
+
+int n: the number of socks in the pile
+int ar[n]: the colors of each sock
+Returns
+
+int: the number of pairs
+Input Format
+
+The first line contains an integer n , the number of socks represented in ar.
+The second line contains n  space-separated integers ar[i], , the colors of the socks in the pile.
+constraints: 1<=n<=100, a<= ar[i] <=100 where 0<i<100  Sample Input
+
+STDIN                       Function
+-----                       --------
+9                           n = 9
+10 20 20 10 10 30 50 10 20  ar = [10, 20, 20, 10, 10, 30, 50, 10, 20]
+
+Sample Output
+
+3   for this write a javascript code that could also satisfy some other hidden test cases  
+*/
+function sockMerchant(n, ar) {
+  // Write your code here
+  console.log(n, ar);
+  let sockCount = {}; //{10,20,20,10,10,30,20,10}
+  // sockCount[10]
+
+  let pairs = 0;
+
+  for (let i = 0; i < n; i++) {
+    let color = ar[i];
+    if (sockCount[color]) {
+      sockCount[color]++;
+    } else {
+      sockCount[color] = 1;
+    }
+    console.log("//", sockCount);
+  }
+  for (let count in sockCount) {
+    console.log(
+      "22",
+      count,
+      sockCount[count],
+      Math.floor(sockCount[count] / 2)
+    );
+    pairs += Math.floor(sockCount[count] / 2);
+  }
+  return pairs;
+}
+PairArrLength = 9;
+pairArr = [10, 20, 20, 10, 10, 30, 50, 10, 20];
+console.log(sockMerchant(PairArrLength, pairArr));
+
+// { '10': 1 }
+// { '10': 1, '20': 1 }
+// { '10': 1, '20': 2 }
+// { '10': 2, '20': 2 }
+// { '10': 3, '20': 2 }
+// { '10': 3, '20': 2, '30': 1 }
+// { '10': 3, '20': 2, '30': 1, '50': 1 }
+// { '10': 4, '20': 2, '30': 1, '50': 1 }
+// { '10': 4, '20': 3, '30': 1, '50': 1 }
+
+// 22 10 4 2
+// 22 20 3 1
+// 22 30 1 0
+// 22 50 1 0
+// function main() {
+//     const ws = fs.createWriteStream(process.env.OUTPUT_PATH);
+
+//     const n = parseInt(readLine().trim(), 10);
+
+//     const ar = readLine().replace(/\s+$/g, '').split(' ').map(arTemp => parseInt(arTemp, 10));
+
+//     const result = sockMerchant(n, ar);
+
+//     ws.write(result + '\n');
+
+//     ws.end();
+// }
+
+function migratoryBirds(arr) {
+  // Write your code here
+  console.log(arr);
+  let maximumCountIds = {};
+
+  for (let i = 0; i < arr.length; i++) {
+    let birdId = arr[i];
+
+    if (maximumCountIds[birdId]) {
+      maximumCountIds[birdId]++;
+    } else {
+      maximumCountIds[birdId] = 1;
+    }
+  }
+  console.log(">>", maximumCountIds);
+  //>> { '1': 1, '3': 1, '4': 3, '5': 1 }
+
+  let requiredArr = [];
+  for (let key in maximumCountIds) {
+    console.log("11", key);
+
+    if (Number(maximumCountIds[key]) > 1) {
+      //    console.log("22",key);
+      console.log("33", maximumCountIds[key]);
+      console.log("///", key);
+      requiredArr.push(Number(key));
+    }
+  }
+  console.log(requiredArr);
+  const sortedArr = requiredArr.sort((a, b) => a - b);
+  console.log(">>", sortedArr);
+  const output = sortedArr[0];
+  return output;
+  // let maximumCountIds = {};
+
+  // // Step 1: Count occurrences of each bird ID
+  // for (let i = 0; i < arr.length; i++) {
+  //   let birdId = arr[i];
+  //   if (maximumCountIds[birdId]) {
+  //     maximumCountIds[birdId]++;
+  //   } else {
+  //     maximumCountIds[birdId] = 1;
+  //   }
+  // }
+
+  // // Step 2: Find the bird with the highest frequency
+  // let mostFrequentBird = null;
+  // let highestFrequency = 0;
+
+  // for (let key in maximumCountIds) {
+  //   let frequency = maximumCountIds[key];
+  //   key = Number(key); // Convert string key to number
+
+  //   // Update if we find a bird with a higher frequency or a tie with a smaller bird ID
+  //   if (frequency > highestFrequency || (frequency === highestFrequency && key < mostFrequentBird)) {
+  //     mostFrequentBird = key;
+  //     highestFrequency = frequency;
+  //   }
+  // }
+
+  // return mostFrequentBird;
+}
+
+console.log("11>", migratoryBirds([1, 4, 4, 4, 5, 3]));
+console.log("22>", migratoryBirds([1, 2, 3, 4, 5, 4, 3, 2, 1, 3, 4]));
+
+function migratoryBirds1(arr) {
+  let countMap = {}; // To store the frequency of each bird ID
+
+  // Count occurrences of each bird ID
+  for (let i = 0; i < arr.length; i++) {
+    let birdId = arr[i];
+    countMap[birdId] = (countMap[birdId] || 0) + 1;
+  }
+
+  let mostFrequentBird = null;
+  let highestFrequency = 0;
+
+  // Find the bird with the highest frequency, and in case of a tie, pick the smaller ID
+  for (let birdId in countMap) {
+    let frequency = countMap[birdId];
+    console.log("fff", frequency);
+    birdId = Number(birdId); // Convert the string key back to number
+
+    if (
+      frequency > highestFrequency ||
+      (frequency === highestFrequency && birdId < mostFrequentBird)
+    ) {
+      mostFrequentBird = birdId;
+      highestFrequency = frequency;
+    }
+  }
+
+  return mostFrequentBird;
+}
+console.log(migratoryBirds1([1, 4, 4, 4, 5, 3]));
+
+function pageCount(n, p) {
+  // // Write your code here
+  // console.log(p,n)
+  // console.log([1,2,3].includes(2))
+  // let pageNumArr=[];
+  // //creating page numbers
+  // for(let i=0;i<=(n/2);i++){
+  //         pageNumArr.push([2*i, 2*i+1])
+  // }
+
+  // console.log(pageNumArr)
+  // const output = [];
+  // //counting from left to right:
+  // // const countLeftToRight = pageNumArr.filter((el, i,arr)=>{
+  // //     if(arr[i].includes(p)){
+  // //         // console.log("fff",i)
+  // //         return `${i}`
+  // //     }})
+  // for(let i=0;i<pageNumArr.length;i++){
+  //     if(pageNumArr[i].includes(p)){
+  //         console.log(">>",i);
+  //         output.push(i)
+  //     }
+  // }
+  // console.log("ooo",output)
+  // console.log("left>>",countLeftToRight)
+  // for(let i=(pageNumArr.length-1);i>=0;i--){
+  //     if(pageNumArr[i].includes(p)){
+  //         console.log("///",i,pageNumArr.length-i-1)
+  //         output.push(pageNumArr.length-i-1);
+  //     }
+  // }
+  // const minLength = output.sort((a,b)=>a-b);
+  // console.log(minLength)
+  // return minLength[0];
+  // // i=0 >> 1
+  // // i=1 >> 2,3
+  // // i=2 >> 4,5
+  // // i=3 >> 6,7
+  // // i=4 >> 8,9
+  // // i=5 >> 10,11
+  const front = Math.floor(p / 2);
+  const back = Math.floor(n / 2 - p / 2);
+
+  console.log(front, back);
+  return Math.min(front, back);
+}
+console.log(pageCount(15, 3));
+console.log(pageCount(16, 3));
+
+function processData1(input) {
+  //Enter your code here
+
+  const [i, n, array] = input.split("\n");
+  // console.log(i,n, array);
+  // console.log(typeof i, typeof n, typeof array);
+  // console.log(array.split(" ").reverse().join(" "))
+  const permutedArr = array.split(" ");
+  console.log(permutedArr);
+  let k = Math.floor((Number(n) + 1) / 2);
+  console.log("kk", k);
+  const outputArr = [];
+  // const output = permutedArr.map((el,i, arr)=>{
+  //     let ele;
+  //     if(arr[i]<arr[i+1] && i<(k-1)){
+  //         return arr[i];
+  //     }else if(arr[i]< arr[i+1] && i>k){
+  //         ele = arr[i+1];
+  //         return ele;
+  //     }else{
+  //         ele = arr[i];
+  //         return ele;
+  //     }
+  // })
+  // console.log(output)
+  for (let i = 0; i < k - 1; i++) {
+    console.log(i);
+    if (permutedArr[i] < permutedArr[i + 1]) {
+      outputArr.push(permutedArr[i]);
+    } // }else{
+    //     permutedArr[i] =permutedArr[i+1];
+    //     outputArr.push(permutedArr[i]);
+    // }
+  }
+  for (let i = permutedArr.length - 1; i >= k - 1; i--) {
+    console.log(">>", i);
+    console.log(permutedArr[i]);
+    let ele;
+    if (permutedArr[i] > permutedArr[i - 1]) {
+      ele = permutedArr[i];
+      outputArr.push(ele);
+    } else {
+      ele = permutedArr[i - 1];
+      outputArr.push(ele);
+    }
+  }
+  console.log("ooo", outputArr.join(" "));
+  return outputArr.join(" ");
+}
+const input1 = `1
+7
+1 2 3 4 5 6 7
+`;
+const input21 = `1
+5
+2 3 5 1 4`;
+console.log(processData1(input1));
+console.log(processData1(input21));
+// A left rotation operation on an array of size n  shifts
+//  each of the array's elements 1  unit to the left. Given an
+//   integer, d, rotate the array that many steps left and return
+//   the result.
+// ex
+// d=2
+// arr= [1,2,3,4,5];
+// // after 2 iterations
+// // arr' = [3,4,5]
+
+//d = 2 means two elements need to rotate to left
+//d = 3 means three elements need to rotate to left
+
+//if d = 3, after 3 iterations
+function leftRotation(d, arr) {
+  if (d > arr.length - 1) {
+    return "rotation is not possible";
+  }
+  // arr.forEach((el, i, arr) => {
+  //   // console.log(i, el);
+  //   let k;
+  //   let ouput;
+  //   while (i > 0) {
+  //     output = arr[arr.length - d];
+  //   }
+  //   console.log("//", ouput);
+  // });
+  // for (let i of arr) {
+  //   console.log(i, arr);
+  //   let d = i;
+  //   console.log(arr[i]);
+  // }
+  // function leftRotation(d, arr) {
+
+  // let output = [];
+  // for (let i = d; i < arr.length; i++) {
+  //   output.push(arr[i]);
+  // }
+  // console.log(d);
+  // while (d > 0) {
+  //   output.push(arr[d - 1]);
+  //   d--;
+  // }
+  // console.log(">>", output);
+  const requiredOutput = arr.slice(d).concat(arr.slice(0, d));
+  console.log("rr", requiredOutput);
+
+  //or
+
+  // const output1 = arr.filter((_, i, arr) => i >= d);
+  const output1 = arr.filter((el, i, arr) => {
+    if (i >= d) {
+      return arr[i];
+    }
+  });
+  console.log(output1);
+  const output2 = arr.filter((_, i, arr) => i < d);
+  // const output2 = arr.filter((el, i, arr) => {
+  //   if (i < d) {
+  //     return arr[i];
+  //   }
+  // });
+  // console.log("22", output2);
+  console.log(output1.concat(output2));
+  // or
+  //using for of loop
+  // in for loop we cannot write index and arr like thid for(let [el,i,arr]){}
+  let index = 0;
+  let result1 = [];
+  for (const el of arr) {
+    if (index < d) {
+      //0,1,2,3,4 :2
+      result1.push(el);
+    }
+    index++;
+  }
+  //reset index
+  index = 0;
+  let result2 = [];
+  for (const el of arr) {
+    if (index >= d) {
+      result2.push(el);
+    }
+    index++;
+  }
+  // console.log("forOf loop:", result1, result2);
+  console.log("for of loop", d, result2.concat(result1));
+
+  console.log("using for in loop");
+  let result3 = [];
+  let result4 = [];
+  for (const i in arr) {
+    // console.log(i); //0 1 2 3 4
+    if (i < d) {
+      result3.push(arr[i]);
+    } else {
+      result4.push(arr[i]);
+    }
+  }
+  console.log("for in loop:", d, result4.concat(result3));
+}
+leftRotation(2, [1, 2, 3, 4, 5]);
+leftRotation(4, [1, 2, 3, 4, 5]);
+leftRotation(5, [1, 2, 3, 4, 5]);
+leftRotation(6, [1, 2, 3, 4, 5]);
+// d =1 ,o/p>> [2,3,4,5,1]
+// d = 2, o/p >> [3,4,5,1,2];
+// //make arry of length
+
+// light 200,
+//  dall 160,
+// dustbin 100,
+// sinkcleaner 100,
+// soap 85,
+// anna 200,
+
+function calcIntrest(principle, totalMoney, years) {
+  // totalMoney = principle+interest
+  // interest = % of interest/yannam * totalYears
+  const interest = totalMoney - principle;
+  const oneYearIntrest = interest / years;
+
+  // const percentageIntrest =
+}
+// A numeric string, , is beautiful if it can be split
+//  into a sequence of two or more positive integers,a[1],
+//  a[2],...,a[n] , satisfying the following conditions:
+
+//  1. a[i] - a[i-1] = 1 for any1<i<=n  (i.e., each element
+// in the sequence is 1 more than the previous element).
+// 2. No a[i] contains a leading zero. For example,s = 10203
+// we can split  into the sequence{1,02,03} , but it is not beautiful because 02 and 03  have leading zeroes.
+// 3. The contents of the sequence cannot be rearranged.
+// For example,s = 312 we can split  into the sequence
+//  {3,1,2} , but it is not beautiful because it breaks
+// our first constraint (i.e.,  1 -3 != 1).  Perform q
+// queries where each query consists of some integer string
+// s . For each query, print whether or not the string is beautiful
+//  on a new line. If it is beautiful, print YES x, where x  is the first
+// number of the increasing sequence. If there are multiple such values of ,
+// x choose the smallest. Otherwise, print NO.
+
+function isBeautiful(s) {
+  //try different lengths of first number(upto half the length of the string)
+  // let s = "1234"
+  for (let length = 1; length <= Math.floor(s.length / 2); length++) {
+    // let firstNum = parseInt(s.slice(0, length),10);
+    let firstNum = parseInt(s.substring(0, length), 10); // 1
+    let valid = true;
+    let expectedNum = firstNum; //1
+    let i = length; // 1, s.length = 4
+
+    //check if the rest of the string follws the pattern
+    while (i < s.length) {
+      expectedNum++; //2
+      const expectedStr = expectedNum.toString();
+      const expectedLen = expectedStr.length; //1
+
+      if (s.substring(i, i + expectedLen) !== expectedStr) {
+        // s.substring(1,(1+1) !== "12")
+        // "1234".substring(1,2) !== "12";
+        //  "12" !== "12"
+        valid = false;
+        break;
+      }
+      i += expectedLen;
+    }
+    // If valid seqence found, return YES with the first number
+    if (valid) {
+      return `YES ${firstNum}`;
+    }
+  }
+  //if no valid sequence found, return  NO
+  return "NO";
+}
+function beautifulStrings(queries) {
+  return queries.map(isBeautiful);
+}
+const queries1 = ["1234", "91011", "99100", "101103", "010203"];
+const results = beautifulStrings(queries1);
+results.forEach((result) => console.log(result));
+
+// console.log("ramesh".substring(0, 2));
+// console.log("ramesh".substring(0, 2), 10);
+// console.log(parseInt("123".substring(0, 2), 10));
+// console.log(parseInt("123".slice(0, 2), 10));

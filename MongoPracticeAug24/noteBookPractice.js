@@ -94,12 +94,15 @@ javascript
 Copy code
 db.collection.insertMany([{ name: "Jane", age: 25 }, { name: "Doe", age: 22 }])
 Status: Modern and preferred for bulk insert operations.
+
 Key Differences:
+
 Number of Documents:
 
 insert(): Can handle both single and multiple document inserts.
 insertOne(): Only inserts a single document.
 insertMany(): Only inserts multiple documents.
+
 Return Objects:
 
 insert(): Returns a WriteResult object.
@@ -393,6 +396,7 @@ db.users
     { hobbies: 1 }
   )
   .pretty();
+
 /*
 {
 	"_id" : ObjectId("66bc16d23d6802bbff2744df"),
@@ -548,7 +552,8 @@ db.movies.find({ genres: "Drama" }, { name: 1, genres: 1 }).pretty();
 */
 
 //the above query is giving all the document which has Drama as its one of element of genres but
-//we want  THE DOCUMENTS WHICH ONLY show the  DRAMA as its element and others dont want show for this we can use .$ operator
+//we want  THE DOCUMENTS WHICH ONLY show the  DRAMA as its element and others dont want show
+//  for this we can use .$ operator
 
 db.movies
   .find({ genres: "Drama" }, { "genres.1": 1 }, { name: 1, genres: 1 })
@@ -564,6 +569,7 @@ db.movies
 //correct query is
 
 db.movies.find({ genres: "Drama" }, { "genres.$": 1 }).pretty();
+
 /*
 { "_id" : ObjectId("64e3aa084ff5db12d7a58e85"), "genres" : [ "Drama" ] }
 { "_id" : ObjectId("64e3aa084ff5db12d7a58e86"), "genres" : [ "Drama" ] }
@@ -588,7 +594,8 @@ db.movies
 
 Positional Projection in MongoDB:-
 Positional projection is a feature in MongoDB that allows you to return only the first matching element from an array field that matches the
-query criteria. It's useful when you want to retrieve specific elements from an array but don't want the entire array returned.
+query criteria.
+ It's useful when you want to retrieve specific elements from an array but don't want the entire array returned.
 
 Explanation of the Positional Operator ($):
 The positional operator ($) returns the first element in the array that matches the query condition.
@@ -611,7 +618,8 @@ db.movies
 		"Thriller"
 	]
 }
-but in the genres array I have  "genres" : [
+but in the genres array I have  
+"genres" : [
 		"Drama",
 		"Crime",
 		"Thriller"
@@ -755,6 +763,7 @@ What it does:
 This query is incorrectly formatted due to having two projection objects separated by a comma. 
 MongoDB expects only one projection object.
 This would throw an error in MongoDB because you cannot have multiple projection objects in the same query.
+
 3. Query 3:
 javascript
 Copy code
@@ -765,6 +774,7 @@ In the projection, it returns:
 The genres array, but starts slicing from index 1 (second element) and returns 2 elements.
 So, if genres is ["Drama", "Action", "Thriller"], the output would be ["Action", "Thriller"].
 Only the sliced genres field is returned. Other fields are excluded unless explicitly included.
+
 4. Query 4:
 javascript
 Copy code
@@ -889,6 +899,7 @@ db.users.updateOne(
 );
 // { "acknowledged" : true, "matchedCount" : 1, "modifiedCount" : 1 }
 db.users.findOne({ _id: ObjectId("66bd73baaf3abccac1c4a1cb") });
+
 /*
 {
 	"_id" : ObjectId("66bd73baaf3abccac1c4a1cb"),
@@ -1005,6 +1016,7 @@ db.users.findOne({ "hobbies.title": "Hiking" });
 	 "salary" : 20000
  }
  */
+
 db.users.updateMany(
   { "hobbies.title": "Cooking" },
   { $set: { employeed: "Self employeed", salary: 30000 } }
@@ -1119,7 +1131,9 @@ db.users.updateMany(
   { "hobbies.title": "Hiking" },
   { $set: { employeed: "Employee", salary: 25000 } }
 );
+
 // { "acknowledged" : true, "matchedCount" : 1, "modifiedCount" : 0 }
+
 db.users.findOne({ "hobbies.title": "Hiking" });
 
 /*
@@ -1211,18 +1225,25 @@ db.users.updateMany(
 Explanation
 Array Matching with $ne:
 
-The $ne operator works fine for fields that are not arrays or if you want to match against the whole array. However, when dealing with arrays, the query needs to handle the array elements properly.
+The $ne operator works fine for fields that are not arrays or if you want to match against the whole array. 
+However, when dealing with arrays, the query needs to handle the array elements properly.
+
 Matching with $exists and $ne:
 
-When you use $ne to check for the absence of an element in an array field, it does not work as expected because MongoDB's query language matches documents where the entire array does not match the condition,
- not just individual elements.
+When you use $ne to check for the absence of an element in an array field, it does not work as expected 
+because MongoDB's query language matches documents where the entire array does not match the condition,
+not just individual elements.
+
 */
+
 //CORRECT QUERY
+
 db.users.updateMany(
   { "hobbies.title": { $ne: "Sports" } },
   { $set: { comment: "You need to have sports as hobbie" } }
 );
 // { "acknowledged" : true, "matchedCount" : 4, "modifiedCount" : 4 }
+
 db.users.find({ "hobbies.title": { $ne: "Sports" } }, { hobbies: 1 }).pretty();
 /*
 {
@@ -1316,7 +1337,7 @@ db.users.find({}).count();
 // 8
 db.users.find({}, { phone: 1 }).count();
 // 8
-//TILL NOW WE HAVE LEARNT IN UPDAATE OPERATORS OF
+//TILL NOW WE HAVE LEARNT IN UPDATE OPERATORS OF
 // UPDATING SINGLE FIELD
 // UPDATING MULTIPLE FIELDS
 // UPDATING THE DOCUMENTS WHICH DOESNOT HAVE SOME SPECIFIC FIELDS
@@ -1325,8 +1346,8 @@ db.users.find({}, { phone: 1 }).count();
 // if you want overwrite the field value use specific document update method
 
 // UPDATING THE DOCUMENTS BASED ON SPECIFIED CONDITION LIKE IF FIELD HAS SOME VALUE FOR THEM ONLY ADD SOME SPECIFIC FIELDS
-//      AND WHICH DOES NOT HAVE SOME QUALITIES FOR THEM ADD SOME OTHER FIELDS
-// UPDSTING THE SINGLE DOCUMENT BY STORING THE VALUE OF UNFIELDS DOCUMENT
+//  AND WHICH DOES NOT HAVE SOME QUALITIES FOR THEM ADD SOME OTHER FIELDS
+// UPDATING THE SINGLE DOCUMENT BY STORING THE VALUE OF UNFIELDS DOCUMENT
 // UPDATING BY USING IF CONDITION
 
 //*************** INCREMENT AND DECREMENT OPERATORS */
@@ -1365,7 +1386,7 @@ db.users.find({ age: { $gt: 40 } }, { name: 1, isSport: 1, age: 1 });
 // { "_id" : ObjectId("66bc16d23d6802bbff2744de"), "name" : "Sara", "age" : 46 }
 // { "_id" : ObjectId("66bc2cdd3d6802bbff2744e2"), "name" : "Jack", "age" : 90 }
 
-//************************************************************ */
+//************************************************************ *
 db.users
   .find([
     { _id: ObjectId("66bc16d23d6802bbff2744de") },
@@ -1428,16 +1449,16 @@ db.users
 }
 */
 db.users.find({}, { age: 1 }).pretty();
-/*
-{ "_id" : ObjectId("66bc16d23d6802bbff2744dd"), "age" : 31 }
-{ "_id" : ObjectId("66bc16d23d6802bbff2744de"), "age" : 46 }
-{ "_id" : ObjectId("66bc16d23d6802bbff2744df"), "age" : 32 }
-{ "_id" : ObjectId("66bc1a633d6802bbff2744e0") }
-{ "_id" : ObjectId("66bc1a633d6802bbff2744e1") }
-{ "_id" : ObjectId("66bc2cdd3d6802bbff2744e2"), "age" : 90 }
-{ "_id" : ObjectId("66bc2e5a3d6802bbff2744e4"), "age" : -3 }
-{ "_id" : ObjectId("66bd73baaf3abccac1c4a1cb"), "age" : -3 }
-*/
+// /*
+// { "_id" : ObjectId("66bc16d23d6802bbff2744dd"), "age" : 31 }
+// { "_id" : ObjectId("66bc16d23d6802bbff2744de"), "age" : 46 }
+// { "_id" : ObjectId("66bc16d23d6802bbff2744df"), "age" : 32 }
+// { "_id" : ObjectId("66bc1a633d6802bbff2744e0") }
+// { "_id" : ObjectId("66bc1a633d6802bbff2744e1") }
+// { "_id" : ObjectId("66bc2cdd3d6802bbff2744e2"), "age" : 90 }
+// { "_id" : ObjectId("66bc2e5a3d6802bbff2744e4"), "age" : -3 }
+// { "_id" : ObjectId("66bd73baaf3abccac1c4a1cb"), "age" : -3 }
+// */
 //ADD THE AGE FIELD WHOSE DOCUMENT DOESNOT HAVE
 
 db.users.find({ age: { $exists: false } }, { age: 1 }).pretty();
@@ -1448,16 +1469,16 @@ db.users.find({ age: { $exists: false } }, { age: 1 }).pretty();
 db.users.updateMany({ age: { $exists: false } }, { $set: { age: 35 } });
 // { "acknowledged" : true, "matchedCount" : 2, "modifiedCount" : 2 }
 db.users.find({}, { age: 1 }).pretty();
-/*
-{ "_id" : ObjectId("66bc16d23d6802bbff2744dd"), "age" : 31 }
-{ "_id" : ObjectId("66bc16d23d6802bbff2744de"), "age" : 46 }
-{ "_id" : ObjectId("66bc16d23d6802bbff2744df"), "age" : 32 }
-{ "_id" : ObjectId("66bc1a633d6802bbff2744e0"), "age" : 35 }
-{ "_id" : ObjectId("66bc1a633d6802bbff2744e1"), "age" : 35 }
-{ "_id" : ObjectId("66bc2cdd3d6802bbff2744e2"), "age" : 90 }
-{ "_id" : ObjectId("66bc2e5a3d6802bbff2744e4"), "age" : -3 }
-{ "_id" : ObjectId("66bd73baaf3abccac1c4a1cb"), "age" : -3 }
-*/
+// /*
+// { "_id" : ObjectId("66bc16d23d6802bbff2744dd"), "age" : 31 }
+// { "_id" : ObjectId("66bc16d23d6802bbff2744de"), "age" : 46 }
+// { "_id" : ObjectId("66bc16d23d6802bbff2744df"), "age" : 32 }
+// { "_id" : ObjectId("66bc1a633d6802bbff2744e0"), "age" : 35 }
+// { "_id" : ObjectId("66bc1a633d6802bbff2744e1"), "age" : 35 }
+// { "_id" : ObjectId("66bc2cdd3d6802bbff2744e2"), "age" : 90 }
+// { "_id" : ObjectId("66bc2e5a3d6802bbff2744e4"), "age" : -3 }
+// { "_id" : ObjectId("66bd73baaf3abccac1c4a1cb"), "age" : -3 }
+// */
 // ********************************************
 //I have two documents with age of 35 now I want to increase one of the document age by 2 and want to decrease the age of
 // the other document by 3 then how can write the single query to do the operation
@@ -1496,6 +1517,7 @@ db.users.findAndModify({
   update: { $set: { age: 48 } },
   new: true // Optional: if you want to return the modified document
 });
+
 /*
 {
 	"_id" : ObjectId("66bc1a633d6802bbff2744e0"),
@@ -1525,8 +1547,10 @@ db.users.find({}, { age: 1 }).pretty();
 */
 db.users.updateOne({ age: { $lte: 0 } }, { $set: { age: 58 } });
 // { "acknowledged" : true, "matchedCount" : 1, "modifiedCount" : 1 }
+
 db.users.updateOne({ age: { $lte: 0 } }, { $set: { age: 23 } });
 // { "acknowledged" : true, "matchedCount" : 1, "modifiedCount" : 1 }
+
 db.users.find({}, { age: 1 }).pretty();
 /*
 { "_id" : ObjectId("66bc16d23d6802bbff2744dd"), "age" : 31 }
@@ -1601,6 +1625,7 @@ DBCollection.prototype.updateMany@src/mongo/shell/crud_api.js:625:1
 DBCollection.prototype.updateMany@src/mongo/shell/crud_api.js:625:1
 @(shell):1:1
 */
+
 db.users.find({}, { age: 1, name: 1 }).pretty();
 /*
 { "_id" : ObjectId("66bc16d23d6802bbff2744dd"), "name" : "Max", "age" : 37 }
@@ -1648,13 +1673,14 @@ db.users.updateOne({ name: "Dean" }, { $min: { age: 25 } });
 db.users.updateOne({ name: "Dean" }, { $min: { age: 20 } });
 // { "acknowledged" : true, "matchedCount" : 1, "modifiedCount" : 1 }
 db.users.findOne({ name: "Dean" }, { age: 1, name: 1 });
-/*
- {
-	"_id" : ObjectId("66bd73baaf3abccac1c4a1cb"),
-	"name" : "Dean",
-	"age" : 20
-}
-*/
+// /*
+//  {
+// 	"_id" : ObjectId("66bd73baaf3abccac1c4a1cb"),
+// 	"name" : "Dean",
+// 	"age" : 20
+// }
+// */
+
 db.users.updateMany({}, { $max: { age: 40 } });
 // { "acknowledged" : true, "matchedCount" : 8, "modifiedCount" : 4 }
 //$max operator changes the age field value to new value if the present value is lower than defined value otherwise wont change to defined value
@@ -1697,6 +1723,7 @@ db.users.find({}, { age: 1 }).pretty();
 */
 // **************************************************************************
 // in mongo db document i have { "_id" : ObjectId("66bc16d23d6802bbff2744dd"), "age" : 52.800000000000004  this value how can I remove that decimal part
+
 db.users.updateMany({}, [{ $set: { age: { $trunc: "$age" } } }]);
 // 2024-08-15T17:37:10.584+0530 E QUERY    [thread1] Error: the update operation document
 // must contain atomic operators :
@@ -1712,12 +1739,15 @@ db.users.updateMany({}, [{ $set: { age: { $trunc: "$age" } } }]);
 // 	...     }
 // 	...   ]
 // 	... )
-// it will work for lated mongodb versions of mongoshell
+
+// it will work for later mongodb versions of mongoshell
 //the CORRECT QUERY TO REMOVE THE DECIMAL PART IN THE DOCUMENT IS
+
 db.users.find({}).forEach(function (doc) {
   db.users.updateOne({ _id: doc._id }, { $set: { age: Math.floor(doc.age) } });
 });
 db.users.find({}, { age: 1 }).pretty();
+
 /*
  { "_id" : ObjectId("66bc16d23d6802bbff2744dd"), "age" : 52 }
 	{ "_id" : ObjectId("66bc16d23d6802bbff2744de"), "age" : 46 }
@@ -1817,6 +1847,7 @@ db.users.findOne();
 }
 
 */
+
 db.users.updateOne(
   { name: "Maria" },
   {
@@ -1865,7 +1896,8 @@ db.users.find({}, { name: 1 }).pretty();
 */
 // document is not inserted
 
-// The document is not being inserted because of the way the updateOne function works. The $upsert option should be placed within the same object as the $set operator and not as a separate argument.
+// The document is not being inserted because of the way the updateOne function works. The $upsert option
+// should be placed within the same object as the $set operator and not as a separate argument.
 
 db.users.updateOne(
   { name: "Maria" },
@@ -1907,11 +1939,13 @@ db.users.updateMany(
   { $upsert: true }
 );
 // { "acknowledged" : true, "matchedCount" : 0, "modifiedCount" : 0 }
+
 db.users.updateMany(
   { name: "Stella" },
   { $set: { age: 26, game: "Cricket" } },
   { upsert: true }
 );
+
 /*
 {
 	"acknowledged" : true,
@@ -1992,6 +2026,7 @@ db.sports.updateMany({}, { $set: { isSport: true } });
 // { "acknowledged" : true, "matchedCount" : 3, "modifiedCount" : 3 }
 db.sports.insert({ name: "Running", isAtlet: true });
 // WriteResult({ "nInserted" : 1 })
+
 db.sports.find({}).pretty();
 /*
 { "_id" : 1, "name" : "football", "isSport" : true }
@@ -2012,6 +2047,7 @@ db.sports.find({}).pretty();
 	"isAtlet" : true
 }
 */
+
 //add  a team which game require a team
 db.sports.updateMany(
   { isSport: true },
@@ -2019,6 +2055,7 @@ db.sports.updateMany(
   { upsert: true }
 );
 // { "acknowledged" : true, "matchedCount" : 3, "modifiedCount" : 3 }
+
 db.sports.find({}).pretty();
 /*
 { "_id" : 1, "name" : "football", "isSport" : true, "no of players" : 15 }
@@ -2232,7 +2269,7 @@ db.sports.find({}).pretty();
 db.users
   .find({ hobbies: { title: "Sports", frequency: { $gt: 3 } } }, { hobbies: 1 })
   .pretty();
-//we cannot get the data with this query we can user $and operator or $elemmatch
+//we cannot get the data with this query we can use $and operator or $elemmatch
 //we cannot find directly like this if array had documents we need to use $elemMatch
 db.users
   .find(
@@ -2240,6 +2277,7 @@ db.users
     { hobbies: 1 }
   )
   .pretty();
+
 /*
 {
 	"_id" : ObjectId("66bc16d23d6802bbff2744dd"),
@@ -2295,6 +2333,7 @@ db.users
   .pretty()
   .count();
 // 3
+
 //DOING MODIFICATION BY ADDING highFrequency : true
 
 db.users.updateMany(
@@ -2302,14 +2341,20 @@ db.users.updateMany(
   { $set: { "hobbies.highFrequency": true } }
 );
 // 2024-08-16T11:37:43.815+0530 E QUERY    [thread1] SyntaxError: missing : after property id @(shell):1:93
-//The error is due to a syntax mistake in the query. Specifically, the issue is with the way you're trying to set the field hobbies.highFrequency. In MongoDB, you cannot directly update a nested field within an array using the standard $set operator without using the positional $ operator or array filters.
+//The error is due to a syntax mistake in the query. Specifically, the issue is with the way you're trying
+// to set the field hobbies.highFrequency.
+// In MongoDB, you cannot directly update a nested field within an array using the standard $set operator
+//  without using the positional $ operator or array filters.
+
 db.users.updateMany(
   { hobbies: { $elemMatch: { title: "Sports", frequency: { $gte: 3 } } } },
   { $set: { "hobbies.$.highFrequency": true } }
 );
+
 // { "acknowledged" : true, "matchedCount" : 3, "modifiedCount" : 3 }
+
 // the use of $ operator: $ is a positional operator. It allows you to update the first array element
-//   that matches the qury condition within an array field.
+//   that matches the query condition within an array field.
 //How it works:
 //  Positional Operator ($):
 //  When you query for a specific condition inside an array, the positional operator $ refers
@@ -2550,7 +2595,7 @@ db.users.updateMany(
 
 // to update like this the fields in the array you need to have a same schema in array
 
-//***************** */
+//***************** *
 // db.users.updateMany({totalAge:{$gt:50}},{$inc:{hobbies.$[].frequency: -1}})
 // 2024-08-16T13:41:58.180+0530 E QUERY    [thread1] SyntaxError: missing : after property id @(shell):1:54
 db.users.updateMany(
@@ -2597,7 +2642,7 @@ db.users.updateOne({ name: "John" }, { $set: { "hobbies.1.frequency": 5 } });
 1. Use the "$" positional operator to update the FIRST MATCHINH element in the array 
 2. Use 'arrayFilters' to update a SPECIFC ELEMENTS based on conditions 
 3. Use the `.$[]` operator to update all elements in as an array 
-4. Use the SPECIFIC INDEX if you know which wlwmwnt you want to update by ITS POSITION in the 
+4. Use the SPECIFIC INDEX if you know which element you want to update by ITS POSITION in the 
 // ************************************************************************************************* *
 */
 db.users.deleteMany([
@@ -2768,16 +2813,26 @@ db.users.find({hobbies:{$elemMatch:{title:"Sports", frequency:{$gte:3}}}}).count
 Difference in Behavior:
 Query 1 ({"hobbies.title": "Sports", "hobbies.frequency": { $gte: 3 }}):
 
-This query checks independently whether any element in the hobbies array has a title of "Sports" and separately checks if any element has a frequency of >= 3.
-Because these conditions are evaluated independently, it's possible that one element in the hobbies array satisfies title: "Sports" and another element satisfies frequency: { $gte: 3 }, but they are not the same element.
-Thus, this query might return documents where these conditions are true for different elements within the array.
+This query checks independently whether any element in the hobbies array has a title of "Sports" and 
+separately checks if any element has a frequency of >= 3.
+Because these conditions are evaluated independently, it's possible that one element in the hobbies 
+array satisfies title: "Sports" and another element satisfies frequency: { $gte: 3 }, but they are not 
+the same element.
+Thus, this query might return documents where these conditions are true for different elements within the 
+array.
+
 Query 2 ({hobbies: { $elemMatch: { title: "Sports", frequency: { $gte: 3 } }}}):
 
-This query uses the $elemMatch operator, which ensures that both conditions must be true for the same array element. It will only match documents where there is an element in the hobbies array that has both title: "Sports" and frequency >= 3.
-This query is more precise and only returns documents where a single element in the hobbies array satisfies both conditions.
+This query uses the $elemMatch operator, which ensures that both conditions must be true for the same array 
+element. It will only match documents where there is an element in the hobbies array that has both
+ title: "Sports" and frequency >= 3.
+This query is more precise and only returns documents where a single element in the hobbies array satisfies
+ both conditions.
 Why the Different Counts?
-The first query might be over-counting because it's not ensuring that the conditions are met by the same array element.
-The second query provides a more accurate count, where both conditions are true for the same element in the hobbies array.
+The first query might be over-counting because it's not ensuring that the conditions are met by the same 
+array element.
+The second query provides a more accurate count, where both conditions are true for the same element in 
+the hobbies array.
 */
 //******************************************************************************** */
 // Conclusion:
@@ -2817,7 +2872,7 @@ db.users.updateMany(
 );
 // { "acknowledged" : true, "matchedCount" : 6, "modifiedCount" : 0 }
 
-//*********************** */
+//*********************** *
 // why modified count is zero if I want getRid of that field embeddedin the array of object
 
 // The reason the modifiedCount is zero is because the query you used does not
@@ -2851,6 +2906,7 @@ db.users.updateMany(
   { $unset: { "hobbies.$[].goodFrequency": "" } }
 );
 // { "acknowledged" : true, "matchedCount" : 2, "modifiedCount" : 2 }
+
 db.users.find({}, { hobbies: 1 }).pretty();
 /*
 {
@@ -2941,7 +2997,7 @@ db.users.find({}, { hobbies: 1 }).pretty();
 	]
 }
 */
-//****************************************$$$$$$$$$$$$$$$$$$$$$***************************** */
+//********************************************************************* */
 
 db.users.updateMany(
   { "hobbies.goodFrequency": true },
@@ -2958,6 +3014,7 @@ db.users.updateMany(
 // The two queries you provided have different behaviors due to the usage of the positional $ operator and
 // the array wildcard $[] operator. ///**********$$$$$$$$$$$$$$$$$$$$******************* */
 // Here's the difference between them:
+
 // First Query ($): Only removes goodFrequency from the first matching element in the hobbies array.
 // Second Query ($[]): Removes goodFrequency from all elements in the hobbies array where goodFrequency exists.
 
@@ -2972,6 +3029,7 @@ db.users
     { name: 1, hobbies: 1 }
   )
   .pretty();
+
 /*
 {
 	  "_id" : ObjectId("66bc16d23d6802bbff2744dd"),
@@ -3026,6 +3084,7 @@ db.users
 // Second Query: Use it when you need to match a specific condition within a 
 // single array element and when dealing with more complex queries where multiple
 // conditions within an array element need to be met.
+
 Conclusion:
 Both queries will yield the same results with the provided documents.
 Choose the first query ("hobbies.goodFrequency": { $exists: true }) for 
@@ -3366,6 +3425,7 @@ arrayFilters is used with $[<identifier>] to specify which elements of
 the array should be updated based on certain conditions.
 In your query, you used $[el] but provided a filter with arrayFilters that 
 doesn't match the query criteria, which leads to the error.
+
 Issue with the Query:
 
 The query attempts to match documents where an element with title: "Sports" does not exist. However, 
@@ -3507,7 +3567,8 @@ WriteError({
 	"index" : 0,
 	"code" : 2,
 	"errmsg" : "No array filter found for identifier 'el' in path 'hobbies.$[el].hasGoodHealth'",
- even I have the documents with specified filter, why its  getting error like no array filter foung for identifier then correct query is to updated the documents for the questions  Find documents that do not have a hobby with the title "Sports".
+ even I have the documents with specified filter, why its  getting error like no array filter found for 
+ identifier then correct query is to updated the documents for the questions  Find documents that do not have a hobby with the title "Sports".
 Update these documents where at least one other hobby's frequency is either 1 or 2. if I hava a documents like this below    {
 	"_id" : ObjectId("66bc2cdd3d6802bbff2744e2"),
 	"hobbies" : [
@@ -3536,19 +3597,26 @@ Update these documents where at least one other hobby's frequency is either 1 or
 }
 ChatGPT said:
 ChatGPT
-It looks like the main issue with your queries is how the $elemMatch operator is used in conjunction with array filters. Array filters can only be applied if the elements in the array match the conditions provided in the arrayFilters.
+It looks like the main issue with your queries is how the $elemMatch operator is used in conjunction with
+ array filters. Array filters can only be applied if the elements in the array match the conditions 
+ provided in the arrayFilters.
 
 Problem Breakdown
 Finding Documents:
 
-Your find query is correctly identifying documents that do not have a hobby with the title "Sports" and have at least one other hobby with a frequency of 1 or 2. The count of 2 suggests that two documents meet this criteria.
+Your find query is correctly identifying documents that do not have a hobby with the title "Sports" and 
+have at least one other hobby with a frequency of 1 or 2. The count of 2 suggests that two documents meet this criteria.
+
 Updating Documents:
 
-The error No array filter found for identifier 'el' in path 'hobbies.$[el].hasGoodHealth' indicates that the array filter el does not match any elements in the documents returned by the find query. This is likely because the filter does not apply to any elements in the documents' hobbies array.
+The error No array filter found for identifier 'el' in path 'hobbies.$[el].hasGoodHealth' indicates that 
+the array filter el does not match any elements in the documents returned by the find query. 
+This is likely because the filter does not apply to any elements in the documents' hobbies array.
 Correct Query Approach
 1. Find Documents That Match Your Criteria
 
-Your find query is already correct. It identifies documents where no hobby has the title "Sports" and where at least one hobby has a frequency of 1 or 2:
+Your find query is already correct. It identifies documents where no hobby has the title "Sports" and 
+where at least one hobby has a frequency of 1 or 2:
 
 javascript
 Copy code
@@ -3600,7 +3668,8 @@ hobbies.$[el].hasGoodHealth: Sets the hasGoodHealth field for array elements tha
 arrayFilters: [{ "el.frequency": { $in: [1, 2] } }]: Filters array elements where frequency is 1 or 2.
 Common Pitfall:
 
-Make sure that there are elements in the hobbies array with frequency 1 or 2 that are also being updated. The $[el] filter only applies to array elements that match the filter specified in arrayFilters.
+Make sure that there are elements in the hobbies array with frequency 1 or 2 that are also being updated. 
+The $[el] filter only applies to array elements that match the filter specified in arrayFilters.
 Troubleshooting
 Verify Document Structure:
 
@@ -3660,19 +3729,20 @@ db.users.updateMany(
     arrayFilters: [{ "el.frequency": { $in: [1, 2] } }]
   }
 );
-Check for Array Content: Ensure that the documents identified by the query actually contain elements in the hobbies array with the frequency values of 1 or 2.
+Check for Array Content: Ensure that the documents identified by the query actually contain elements in the
+ hobbies array with the frequency values of 1 or 2.
 
-Test with Sample Data: To further troubleshoot, you can test with simpler or more specific queries to see if the arrayFilters work correctly:
-
-javascript
-Copy code
+Test with Sample Data: To further troubleshoot, you can test with simpler or more specific queries to see 
+if the arrayFilters work correctly:
 db.users.updateMany(
   { hobbies: { $not: { $elemMatch: { title: "Sports" } } } },
   { $set: { "hobbies.$[el].hasGoodHealth": true }, arrayFilters: [{ "el.frequency": { $in: [1, 2] } }] }
 );
 Make sure to test this with documents that match the criteria specified in your arrayFilters.
 
-Review Documents: Ensure that the documents in your database have the structure you expect, particularly the hobbies array and its elements. The filter condition must match the exact structure of the documents.
+Review Documents: Ensure that the documents in your database have the structure you expect, 
+particularly the hobbies array and its elements. The filter condition must match the exact structure of
+ the documents.
 
 Debugging the Issue
 Check Documents Manually: Manually review the documents to ensure they meet the criteria. For example:
@@ -3927,7 +3997,8 @@ db.users.updateOne(
 );
 
 // { "acknowledged" : true, "matchedCount" : 1, "modifiedCount" : 0 }
-//No Exact Match: The hobbies array might not contain an element with both title: "eating" and frequency: 2. For the $pull operation to remove an element, both conditions must match exactly in the same element.
+//No Exact Match: The hobbies array might not contain an element with both title: "eating" and frequency: 2.
+//  For the $pull operation to remove an element, both conditions must match exactly in the same element.
 db.users.updateOne(
   { name: "Maria" },
   { $pull: { hobbies: { title: "eating", frequency: 3 } } }
@@ -4011,7 +4082,7 @@ db.users.updateOne(
   {
     $pull: {
       hobbies: {
-        $each: [
+        $or: [
           { title: "running", frequency: 2 },
           { title: "goodwine", frequency: 1 }
         ]
@@ -4047,7 +4118,7 @@ db.users.updateOne(
 */
 // with $pull we can remove desired elements by specific the desired elements in the query
 
-//can we remove the elements from multple documents using $pull operator
+//can we remove the elements from MULTIPLE DOCUMENTS using $pull operator
 
 // Yes, you can remove elements from arrays in multiple documents using
 // the $pull operator in MongoDB. The $pull operator can be applied in combination with updateMany to target multiple documents that match a given query.
@@ -4142,6 +4213,7 @@ db.users.findOne({ name: "Maria" });
 }
 */
 // *********************************************************
+
 //*******************  #ADDTOSET OPERATOR  */
 /*
 The $addToSet operator in mongoDB is used to add a value to an array only if it does not 
@@ -4194,7 +4266,8 @@ db.users.updateOne(
   { name: "Maria" },
   { $addToSet: { hobbies: { title: "Cooking", frequency: 2 } } }
 );
-// { "acknowledged" : true, "matchedCount" : 1, "modifiedCount" : 0 } //********************* */
+// { "acknowledged" : true, "matchedCount" : 1, "modifiedCount" : 0 } //********************* *
+
 db.users.updateOne(
   { name: "Maria" },
   { $addToSet: { hobbies: { title: "Cooking", frequency: 1 } } }
@@ -4289,7 +4362,7 @@ db.users.findOne({ name: "Steven" });
 */
 //only Dancing was added, and Swimming is not added because its
 // already present
-// can we delet some fields in  the documents with deleteMany()
+// can we delete some fields in  the documents with deleteMany()
 // and deleteOne() methods
 
 //*************************** INDEXES  *************************/
@@ -4389,6 +4462,7 @@ db.persons.explain("executionStats").find({ "dob.age": { $lt: 45 } });
       "totalDocsExamined" : 5004,
   
     */
+
 db.persons
   .find({ "dob.age": { $lt: 45 } })
   .pretty()
@@ -4592,35 +4666,50 @@ db.persons.explain("executionStats").find({ "dob.age": { $gt: 65 } });
 	},
 	"nat" : "BR"
 }
-I have document like this, I want to create a index called text index on gender,  I created index like {gender:1}, then in the disc how the mongodb will create the indexed collection for gender as the gender is male and female and index is text index
-ChatGPT said:
-ChatGPT
-When you create an index in MongoDB, such as { gender: 1 }, it's a B-tree index rather than a text index. Let's break down what this means and how it behaves:
+I have document like this, I want to create a index called TEXT INDEX on gender,  I created index like
+{gender:1}, then in the disc how the mongodb will create the indexed collection for gender as the gender is
+ male and female and index is text index
+ 
+When you create an index in MongoDB, such as { gender: 1 }, it's a B-tree index rather than a text index.
+ Let's break down what this means and how it behaves:
 
 1. Creating a B-tree Index on gender:
-When you create an index like { gender: 1 }, MongoDB organizes the values in a B-tree structure. This index allows for efficient querying of the gender field.
+When you create an index like { gender: 1 }, MongoDB organizes the values in a B-tree structure.
+ This index allows for efficient querying of the gender field.
 The 1 specifies that the index is in ascending order. If you used -1, it would be descending.
 2. How MongoDB Stores Indexed Data:
-For the gender field, MongoDB will store the field values (e.g., "male", "female") in a sorted manner in the B-tree.
+For the gender field, MongoDB will store the field values (e.g., "male", "female") in a sorted manner in 
+the B-tree.
 The index will map these sorted values to their corresponding document locations on disk.
+
 3. What Happens in the B-tree Index:
-If you have documents with gender values like "male" and "female", the B-tree index will contain entries like this:
+If you have documents with gender values like "male" and "female", the B-tree index will contain entries 
+like this:
 rust
 Copy code
 "female" -> ObjectId("66c34517ad083f11eb00a05e")
 "male"   -> ObjectId("66c34517ad083f11eb00a05f")
-This allows MongoDB to quickly locate all documents where gender is "male" or "female" by traversing the index rather than scanning the entire collection.
+This allows MongoDB to quickly locate all documents where gender is "male" or "female" by traversing the 
+index rather than scanning the entire collection.
+
 4. Text Indexes vs. B-tree Indexes:
-A text index in MongoDB is different and is used for full-text search, allowing you to search within string content across multiple fields.
+A text index in MongoDB is different and is used for full-text search, allowing you to search within string 
+content across multiple fields.
 Creating a text index looks like this:
-javascript
-Copy code
+
 db.collection.createIndex({ gender: "text" });
-Text indexes are typically used for search functionality, like finding documents that contain specific keywords.
+
+Text indexes are typically used for search functionality, like finding documents that contain specific 
+keywords.
+
 5. Behavior on Disk:
-B-tree Index (like {gender: 1}): The index is stored as a B-tree, where each node represents a range of values, making searches for specific values (like "male" or "female") very fast.
-Text Index: If you created a text index on gender, MongoDB would tokenize the values and store them in a format optimized for text search. However, a text index on a simple field like gender is less common since gender typically contains discrete values (like "male" or "female").
-6. Example Query Using the Index:
+B-tree Index (like {gender: 1}): The index is stored as a B-tree, where each node represents a range of 
+values, making searches for specific values (like "male" or "female") very fast.
+Text Index: If you created a text index on gender, MongoDB would tokenize the values and store them in
+ a format optimized for text search. However, a text index on a simple field like gender is less common 
+ since gender typically contains discrete values (like "male" or "female").
+
+ 6. Example Query Using the Index:
 After creating the B-tree index on gender, you could run:
 javascript
 Copy code
@@ -4629,10 +4718,12 @@ MongoDB would use the index to quickly locate all documents where gender is "mal
 Summary:
 B-tree Index: Efficient for equality checks on discrete values (e.g., "male", "female").
 Text Index: More suitable for full-text searches across large textual content.
-If you intended to create a text index for searching within text content, you would use {gender: "text"}, but for most use cases involving discrete values like gender, a B-tree index {gender: 1} is appropriate.
 
+If you intended to create a text index for searching within text content, you would use {gender: "text"}, 
+but for most use cases involving discrete values like gender, a B-tree index {gender: 1} is appropriate.
 
 */
+
 db.persons.createIndex({ gender: 1 });
 // {
 // 	"numIndexesBefore" : 1,
@@ -4679,6 +4770,7 @@ db.persons.explain("executionStats").find({ gender: "male" });
 db.persons
   .explain("executionStats")
   .find({ "dob.age": { $gt: 40 }, gender: "male" });
+
 /*
 {
 	"explainVersion" : "2",
@@ -4827,7 +4919,8 @@ db.persons.explain("executionStats").find({ "dob.age": { $gt: 60 } });
 		"totalDocsExamined" : 1222,
 
 */
-//using same index for finding gener based
+
+//using same index for finding gender based
 db.persons.explain("executionStats").find({ gender: "male" });
 /*
 {
@@ -4865,7 +4958,7 @@ db.persons.explain("executionStats").find({ gender: "male" });
 // "indexName" : "dob.age_1_gender_1",
 // "indexName" : "dob.age_1"
 
-//BUT NOT WORK AS  //*********************************************************** */
+//BUT NOT WORK AS  //*********************************************************** *
 // "indexName" :gender_1",
 // USING INDEXES FOR SORTING
 db.persons.getIndexes()[
@@ -4926,11 +5019,12 @@ db.persons.getIndexes()[
     },
     name: "dob.age_1_gender_1"
   })
-]; //**************************************************************** */
+];
+//**************************************************************** */
 //  I have indexes like this, but I want to create a index on only for males
 // like indexName: gender_male instead of gender_1 can I do like that
 
-// In MongoDB, indexes are created on fields, not on specific values within
+// In MongoDB, indexes are created on fields, NOT ON SPECIFIC VALUES within
 // those fields. This means that you cannot create an index specifically for
 // documents where gender is "male". However, you can create a partial index
 // that only indexes documents where gender is "male". This partial index will
@@ -4991,7 +5085,9 @@ db.persons.createIndex({ email: 1 }, { unique: true });
 
 // {
 // 	"ok" : 0,
-// 	"errmsg" : "Index build failed: 8ec660c0-8170-4266-a47e-b7a264e86682: Collection practice.persons ( d695c41e-45c7-4665-a681-c479f3c8ac4e ) :: caused by :: E11000 duplicate key error collection: practice.persons index: email_1 dup key: { email: null }",
+// 	"errmsg" : "Index build failed: 8ec660c0-8170-4266-a47e-b7a264e86682: Collection practice.persons
+// ( d695c41e-45c7-4665-a681-c479f3c8ac4e ) :: caused by :: E11000 duplicate key error
+//  collection: practice.persons index: email_1 dup key: { email: null }",
 // 	"code" : 11000,
 // 	"codeName" : "DuplicateKey",
 // 	"keyPattern" : {
@@ -5259,6 +5355,7 @@ in a collection are indexed.
 This ca be useful for optimising queries 
 that only need to access a subset of the documents in a collection
 Overview of partialFilterExpression
+
 Purpose:
 
 The partialFilterExpression allows you to create an index that only includes 
@@ -5337,11 +5434,13 @@ db.persons
 
 here if you see mongodb used collection scan not indexScan
 this is because  of the following reasons
+
 1. Partial Index Limitation:
 Partial index: The index you created on "dob.age" includes only the 
 documents where the gender is male. This means the index does not cover
-docs wher gender is anything other than 'male' or where gender is not present
- Query Condition: The query {"dob.age":{$gt:60}} doesnot include
+docs where gender is anything other than 'male' or where gender is not present
+
+Query Condition: The query {"dob.age":{$gt:60}} doesnot include
  a filter on 'gender'. This means that the query might petentially match documents 
  where 'gender' is not 'male', which are not included.
 
@@ -5356,6 +5455,7 @@ matching documents.
 Summary:
 Collection Scan occurred because the query did not match the 
 partialFilterExpression of the index.
+
 MongoDB could not use the index for the query because it might
  miss documents outside the partial index.
 Solution: Include the condition on gender in the query to use 
@@ -5474,7 +5574,11 @@ db.persons.createIndex(
 /*
 {
 	"ok" : 0,
-	"errmsg" : "Error in specification { key: { email: 1.0 }, name: \"email_1\", partialFilteExpression: { email: { $exits: true, $eq: null } } } :: caused by :: The field 'partialFilteExpression' is not valid for an index specification. Specification: { key: { email: 1.0 }, name: \"email_1\", partialFilteExpression: { email: { $exits: true, $eq: null } } }",
+	"errmsg" : "Error in specification { key: { email: 1.0 }, name: \"email_1\", 
+	partialFilteExpression: { email: { $exits: true, $eq: null } } } :: caused by :: 
+	The field 'partialFilteExpression' is not valid for an index specification. 
+	Specification: { key: { email: 1.0 }, name: \"email_1\", partialFilteExpression: { email: { $exits: true, $eq: null } } }",
+
 	"code" : 197,
 	"codeName" : "InvalidIndexSpecificationOption"
 }
@@ -5486,7 +5590,9 @@ db.persons.createIndex(
 /*
   {
     "ok" : 0,
-    "errmsg" : "Error in specification { key: { email: 1.0 }, name: \"email_1\", partialFilterExpression: { email: { $exists: true, $ne: null } }, v: 2 } :: caused by :: Expression not supported in partial index: $not\n    email $eq null\n",
+    "errmsg" : "Error in specification { key: { email: 1.0 }, name: \"email_1\", 
+	partialFilterExpression: { email: { $exists: true, $ne: null } }, v: 2 } :: caused by ::
+	 Expression not supported in partial index: $not\n    email $eq null\n",
     "code" : 67,
     "codeName" : "CannotCreateIndex"
   }
@@ -5560,7 +5666,9 @@ db.session.createIndex({ createdAt: 1 }, { expireAfterSeconds: 10 });
 // 	"createdCollectionAutomatically" : false,
 // 	"ok" : 1
 // }
+
 db.session.find().pretty();
+``;
 // {
 // 	"_id" : ObjectId("66c47d9cda81ac7548953f99"),
 // 	"data" : "about Time-to-live index",
@@ -5594,7 +5702,7 @@ db.session.find();
 //after time that we added in index creation
 
 //YOU CAN ONLY USE THIS IN SINGLE FIELD INDEXES, IT DOESNOT WORK ON COMPUND
-// INDEXES AND AS WE MENTIONED IT WORKS ON DTA OBJECTS ONLY.
+// INDEXES AND AS WE MENTIONED IT WORKS ON DATE OBJECTS ONLY.
 //******************************************************************************* */
 
 //
@@ -5850,7 +5958,8 @@ will allow MongoDB to use an index scan, improving query performance.
 */
 db.persons.find({ "name.first": "sandra", "name.last": "rojas" });
 /*
-but iif wrote query like this mongodb using collection scan even I have indexes db.persons.getIndexes()
+but iif wrote query like this mongodb using collection scan even I have indexes
+ db.persons.getIndexes()
 [
 	{
 		"v" : 2,
@@ -5942,7 +6051,8 @@ db.persons.getIndexes();
 db.persons
   .find({ "name.first": "sandra", "name.last": "rojas" })
   .explain("executionStats");
-// Ensure that the winningPlan section shows an IXSCAN stage indicating that the index is being used.
+// Ensure that the winningPlan section shows an IXSCAN stage indicating that the index is
+//  being used.
 
 db.persons.createIndex({ "name.first": 1, "name.last": 1 });
 /*
@@ -5985,7 +6095,10 @@ db.persons.find(
   { "name.first": "sandra", "name.last": "lorenzo" },
   { name: 1, dob: 1 }
 );
-// { "_id" : ObjectId("66c34517ad083f11eb00a05e"), "name" : { "title" : "miss", "first" : "sandra", "last" : "lorenzo" }, "dob" : { "date" : "1975-03-23T17:01:45Z", "age" : 43 } }
+// { "_id" : ObjectId("66c34517ad083f11eb00a05e"),
+// 	 "name" : { "title" : "miss", "first" : "sandra", "last" : "lorenzo" },
+// 	 "dob" : { "date" : "1975-03-23T17:01:45Z", "age" : 43 }
+// }
 db.persons
   .explain("executionStats")
   .find(
@@ -6099,16 +6212,24 @@ db.persons
               "totalKeysExamined" : 1,
               "totalDocsExamined" : 1,
           
-              in the query  i made _id:0 , the totalDocsExamined:1 but it has to come for 1 right, then why it is came 1, here iam working on covered query 
-ChatGPT said:
-ChatGPT
-In MongoDB, a "covered query" is a query where the fields requested in the query and the fields returned are all present in the index used. This means that MongoDB can satisfy the query using only the index and doesn't need to fetch the actual documents from the collection, which can improve performance.
+              in the query  i made _id:0 , the totalDocsExamined:1 but it has to come for 
+			1 right, then why it is came 1, here iam working on covered query 
 
-In your case, you are querying with {"name.first": "sandra", "name.last": "lorenzo"} and projecting only the name field while excluding _id. The query uses an index on name.first and name.last, and the executionStats indicates that:
+In MongoDB, a "covered query" is a query where the fields requested in the query and the 
+fields returned are all present in the index used. This means that MongoDB can satisfy the 
+query using only the index and doesn't need to fetch the actual documents from the 
+collection, which can improve performance.
+
+In your case, you are querying with {"name.first": "sandra", "name.last": "lorenzo"} and 
+projecting only the name field while excluding _id. The query uses an index on name.first 
+and name.last, and the executionStats indicates that:
 
 totalKeysExamined: 1 — This reflects that MongoDB examined one key from the index.
-totalDocsExamined: 1 — This indicates that even though it’s a covered query, MongoDB still had to look at one document.
-This can happen because while the index covers the fields needed for the query, the query engine still needs to validate the documents in the index to ensure they match the query criteria. In this case, the document matching the query condition was examined to confirm it meets the criteria.
+totalDocsExamined: 1 — This indicates that even though it’s a covered query, MongoDB still
+						 had to look at one document.
+This can happen because while the index covers the fields needed for the query, the query 
+engine still needs to validate the documents in the index to ensure they match the query 
+criteria. In this case, the document matching the query condition was examined to confirm it meets the criteria.
 
 So, despite the query being covered, MongoDB may still examine the document associated with the index key to ensure it matches the query's conditions. This is why totalDocsExamined shows 1 even in a covered query.
 
@@ -6200,8 +6321,10 @@ db.persons.explain().find({ age: { $gt: 30 } });
 // 2. Evaluation of Plans:
 
 // MongoDB simulates the execution of these plans to estimate their performance.
-// The performance metrics considered include the number of documents scanned, the number of keys examined, and the overall execution time.
+// The performance metrics considered include the number of documents scanned, the
+// number of keys examined, and the overall execution time.
 // The query planner assigns a score to each plan based on these metrics.
+
 // 3. Evaluation of Plans:
 
 // MongoDB simulates the execution of these plans to estimate their performance.
@@ -6216,7 +6339,9 @@ db.persons.explain().find({ age: { $gt: 30 } });
 
 // The other plans that were generated but not selected are "rejected plans."
 // These plans are discarded after the best plan is chosen.
-// However, the query planner may keep track of these plans for debugging or analysis, especially if the performance of the selected plan turns out to be suboptimal during actual execution.
+// However, the query planner may keep track of these plans for debugging or analysis,
+// especially if the performance of the selected plan turns out to be suboptimal during
+// actual execution.
 
 //
 
@@ -6224,12 +6349,14 @@ db.persons.explain().find({ age: { $gt: 30 } });
 
 // A multi key index in mongoDB is an index tha allows efficient quering of docs
 //  that contains an array,
-// when you create index on a field that contains an array, MongoDB automatically creates a multikey index.
+// when you create index on a field that contains an array, MongoDB automatically creates
+// a multikey index.
 //This means that MongoDB indexes each element of the array separetely, allowing
 // for efficient queries tha invove any or all elements of the array
 
 //
 ////NOW ADD INDEX ON ARRAY ****************************
+
 db.users.find({ hobbies: "Eating" });
 /*
 { "_id" : ObjectId("66c54fc6b933caba4e209f41"), "name" : "John", "hobbies" : [ "Eating", "Workouts", "Boxing" ], "address" : [ { "street" : "mainStreet" }, { "street" : "secondLine" } ] }
@@ -6240,7 +6367,9 @@ db.users.find({ hobbies: "Eating" });
 db.users.find({ hobbies: "hiking" });
 db.users.find({ hobbies: "Hiking" });
 // { "_id" : ObjectId("66c09b35b2cc291f1488dd83"), "name" : "Steven", "hobbies" : [ "Cooking", "Hiking", "Swimming", { "title" : "Running", "frequency" : 2 }, "Dancing" ] }
-//the documents who has hobbies as array they only returned but the documents who has objects of array as hobbies were not returned. Because the calling for  like that array is different
+//the documents who has hobbies as array they only returned but the documents who has objects
+//  of array as hobbies were not returned. Because the calling for  like that array is
+// different
 
 //create index on hobbies array
 db.users.getIndexes();
@@ -6347,7 +6476,8 @@ db.users.explain("executionStats").find({ hobbies: "Eating" });
 // Techniclly multikey indexes are working like normal index but they are stored differently
 
 // The "isMultiKey": true flag in the query planner's output indicates that the index being
-// used is a multikey index. In MongoDB, an index is considered multikey if it is created on a field that holds an array value in any document in the collection.
+// used is a multikey index. In MongoDB, an index is considered multikey if it is created
+// on a field that holds an array value in any document in the collection.
 
 Summary;
 
@@ -6608,9 +6738,12 @@ db.users.explain("executionStats").find({ address: "firstStreet" });
 
 //answer is
 
-// The first query didn't use the index because MongoDB needs an index on the specific subfield being queried ("address.street"), not just on the array field (address).
+// The first query didn't use the index because MongoDB needs an index on the specific
+// subfield being queried ("address.street"), not just on the array field (address).
 
-// The second query used the index, but since it looked for the entire address field to match a string, it didn't return any documents because address is an array of objects, not a string.
+// The second query used the index, but since it looked for the entire address field to
+// match a string, it didn't return any documents because address is an array of objects,
+// not a string.
 
 // To optimize queries on subfields within arrays, create an index specifically on those subfields.
 
@@ -6722,7 +6855,7 @@ index, with one array , not with multiple arrays
 ///******************    T E X T   I N D E X E S   ******************* */
 
 // This  index turn the given text into arry of words nd stored them in the array
-// One exta thing what it does is it removes all the stoping words(a,an,the,is,at,your.etc)
+// One extra thing what it does is it removes all the stoping words(a,an,the,is,at,your.etc)
 //  and it stems all the word, and you have array of keywords
 //specil kind of multikey index is -text index
 db.indexText.insertMany([
@@ -6732,6 +6865,7 @@ db.indexText.insertMany([
     description: "This T-shirt is red and it's a pretty awesome!"
   }
 ]);
+
 /*{
 	"acknowledged" : true,
 	"insertedIds" : [
@@ -6815,7 +6949,7 @@ db.indexText.find().pretty();
 	"description" : "This T-shirt is red and it's a pretty awesome!"
 }
 */
-//now find the booke which is in red color
+//now find the book which is in red color
 db.indexText.find({ description: "awesome" }).pretty();
 db.indexText.find({ description: "young artist" }).pretty();
 //in this way we cannot find the docs by using text as filter criteria
@@ -7098,10 +7232,11 @@ the resong isMultiKey:true because index ont he description field as a multikey 
 	what makes MongoDB treat the text index as multikey. Even though your documents do not 
 	contain arrays, the text index itself is processed in a way that resembles the behavior 
 	of multikey indexes.
+
 IMPACT:
 >>> This 'isMultiKey:true' flag doesnot negatively impact the performance or 
 	correctness of your queries.
-	It is simply an internl representation of how MongoDB hancle text indexes.
+	It is simply an internl representation of how MongoDB handle text indexes.
 
 So, in summary, the isMultiKey: true in your explain output is expected behavior for 
 text indexes in MongoDB, and it occurs due to the way text data is tokenized and indexed.
@@ -7199,7 +7334,10 @@ db.movies.find().pretty();
 		"medium" : "http://static.tvmaze.com/uploads/images/medium_portrait/0/1.jpg",
 		"original" : "http://static.tvmaze.com/uploads/images/original_untouched/0/1.jpg"
 	},
-	"summary" : "<p><b>Under the Dome</b> is the story of a small town that is suddenly and inexplicably sealed off from the rest of the world by an enormous transparent dome. The town's inhabitants must deal with surviving the post-apocalyptic conditions while searching for answers about the dome, where it came from and if and when it will go away.</p>",
+	"summary" : "<p><b>Under the Dome</b> is the story of a small town that is suddenly and inexplicably
+				 sealed off from the rest of the world by an enormous transparent dome. The town's 
+				 inhabitants must deal with surviving the post-apocalyptic conditions while searching for 
+				 answers about the dome, where it came from and if and when it will go away.</p>",
 	"updated" : 1529612668,
 	"_links" : {
 		"self" : {
@@ -7262,7 +7400,7 @@ db.movies
 // 				Each season features a new cast and a new case.</p>"
 // // }
 //********************************************** */
-// document i have created one text index, Now 1. i want to create one more text
+// in document i have created one text index, Now 1. i want to create one more text
 // index on the same field and also 2.on the other fileds seperately how can i do???????????/
 
 // In MongoDB, there are certain constraints regarding text indexes that you need to be aware of:
@@ -7286,14 +7424,16 @@ db.movies.createIndex({ summary: "text" });
 // 	 "createdCollectionAutomatically" : false,
 // 	 "ok" : 1
 //  }
-//this index is created on entire summary field,if we search any one of the word from summary then it uses this summary_text index. No need to create other index for seperate words to find.
+//this index is created on entire summary field,if we search any one of the word from summary then it uses
+//  this summary_text index. No need to create other index for seperate words to find.
+
 //SUMMARY_TEXT index is applicable for all the word present in the summary field.
 
 //  how can I write multiple words to search using textIndex in the query ?????????????????????**************
 
 //	To search for multiple words using a text inde in MongoDB, you can include
 // the words in the '$search' string of the '$text' query.
-// Mongodb will search for documents that contacin any of hte specified word in
+// Mongodb will search for documents that contain any of hte specified word in
 // the indexed text fields.
 // By defalult, MOngoDB uses an "OR" condition between the word, so it
 // returns docs containing any of the words.
@@ -7316,6 +7456,7 @@ db.movies
 // searching for answers about the dome, where it came from and if and when it will go away.</p>"
 // }
 // Exact Phrase Search:>>>>>>>>>>>>>..
+
 db.movies
   .find(
     { $text: { $search: '"touch darkness"' } },
@@ -7582,9 +7723,9 @@ faster and more efficient.
 
 Conlusion:
 Text indexs are essential for large-scale, complex full-text searches where 
-	performance and relevance ranking arecrucial
+	performance and relevance ranking are crucial
 Collection scans might seems faster in small datsets, but they do not scale 
-well and will becom inefficient as your grows.
+well and will become in efficient as your grows.
 
 In summary, while the collection scan was faster in this tiny dataset, text 
 indexes are far more beneficial for larger datasets and complex search 
@@ -7637,8 +7778,9 @@ db.products.find({ $text: { $search: "awesome T-Shirt" } }).pretty();
 }
 
  //here we got two docs but the correct doc for our query is second one. 
-this can be findout by usingscores its reults on projection.
+this can be findout by using scores its reults on projection.
 this is due to how MongoDB text search works. 
+
 ******* MongoDB's text search is designd to find the docs that CONTAIN ANY 
 OF THE WORD SPECIFIED IN THE SEARCG STRING, RATHER THAN REQUIRING AN EXACT MATCH
 FOR THE ENTIRE PHRASE.
@@ -8723,10 +8865,10 @@ db.numbers.aggregate([{ $project: { result: { $subtract: ["$a", "$b"] } } }])[
 //actual result a-b is 0.2 but it resluted another value
 // The issue you're encountering is due to how floating-point arithmetic works
 //  in most programming languages and databases, including MongoDB.
-// Although MongoDB uses 64-bit double precision to store numbers, this does 
+// Although MongoDB uses 64-bit double precision to store numbers, this does
 // not guarantee exact precision for all decimal numbers.
 
-db.numbers.aggregate([{$project:{result:{$sum:["$a", "$b"]}}}])
+db.numbers.aggregate([{ $project: { result: { $sum: ["$a", "$b"] } } }]);
 // { "_id" : ObjectId("66cfecd8aa88a186f9fdf2c2"), "result" : 0.4 }
 //
 

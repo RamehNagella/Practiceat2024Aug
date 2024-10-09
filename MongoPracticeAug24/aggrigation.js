@@ -35,6 +35,75 @@ db.movies.aggregate([
     }
   }
 ]);
+db.moviesList.insertMany([
+  { _id: 1, title: " movie1", network: { name: "Network A" } },
+  { _id: 2, title: "movie2", network: { name: "Network B" } }
+]);
+db.networkList.insertMany([
+  { id: 101, name: "Network A", country: "USA" },
+  { id: 102, name: "Network B", country: "Canada" }
+]);
+db.moviesList.aggregate([
+  {
+    $lookup: {
+      from: "networkList",
+      localField: "network.name",
+      foreignField: "name",
+      as: "networkDetails"
+    }
+  }
+])[
+  ({
+    _id: 1,
+    title: " movie1",
+    network: { name: "Network A" },
+    networkDetails: [
+      {
+        _id: ObjectId("6704c085ee82939ec5136cc8"),
+        id: 101,
+        name: "Network A",
+        country: "USA"
+      }
+    ]
+  },
+  {
+    _id: 2,
+    title: "movie2",
+    network: { name: "Network B" },
+    networkDetails: [
+      {
+        _id: ObjectId("6704c085ee82939ec5136cc9"),
+        id: 102,
+        name: "Network B",
+        country: "Canada"
+      }
+    ]
+  })
+];
+//assignning the result to variablbe
+/*
+const movieDetails = db.moviesList.aggregate([
+...   {
+...     $lookup: {
+...       from: "networkList",
+...       localField: "network.name",
+...       foreignField: "name",
+...       as: "networkDetails"
+...     }
+...   }
+... ])
+> movieDetails
+{ "_id" : 1, "title" : " movie1", "network" : { "name" : "Network A" }, "networkDetails" : [ { "_id" : ObjectId("6704c085ee82939ec5136cc8"), "id" : 101, "name" : "Network A", "country" : "USA" } ] }
+{ "_id" : 2, "title" : "movie2", "network" : { "name" : "Network B" }, "networkDetails" : [ { "_id" : ObjectId("6704c085ee82939ec5136cc9"), "id" : 102, "name" : "Network B", "country" : "Canada" } ] }
+*/
+
+// Key Point:
+// The names of the fields (localField and foreignField) do not
+//  need to be the same. They just need to contain matching
+//  values for the $lookup to work.
+
+// In this case, the join works correctly because the values in network.name ("Network A") match the
+//  values in networkName ("Network A"), even though the field names are different.
 
 // 7. $limit: Limit Number of Results
 db.movies.aggregate([{ $limit: 5 }]);
@@ -71,6 +140,8 @@ db.movies.aggregate([
 
 // 12. $replaceRoot: Replace Document Root
 db.movies.aggregate([{ $replaceRoot: { newRoot: "$network" } }]);
+// it is used to  take out the embedded document to top-level
+// and replacing the original document structure entirely.
 
 // 13. $facet: Multi-Faceted Search
 // Problem: Perform multiple operations and return them as separate results.
@@ -337,7 +408,7 @@ db.movies
   To compare the document with field value this is not correct 
   value right. then how can I write the correct format of date in 
   query to compare with the field value of document and write correct 
-  query to find the no of show that premiered after specific date?
+  query to find the no of shows that premiered after specific date?
 
   Your understanding is correct—if you use new Date("2013-06-24") in 
   JavaScript, it will correctly create a Date object representing June 24, 2013, 

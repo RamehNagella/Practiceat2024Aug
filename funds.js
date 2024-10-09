@@ -75,7 +75,7 @@ console.log(` I would like to drink a ${age >= 18 ? "wine" : "water"}`);
 function arrSum(arr) {
   let sum = 0;
   for (let i = 0; i < arr.length; i++) {
-    sum += arr[0];
+    sum += arr[i];
   }
   return sum;
 }
@@ -258,7 +258,7 @@ console.log(new Date(Date.now()).getMinutes());
 const jons = ["Jonas", "Schmedthmann", 2037 - 1996, ["mike", "peter"]];
 console.log(jons); //[ 'Jonas', 'Schmedthmann', 41, [ 'mike', 'peter' ] ]
 
-//print jons array has which type of elements in it
+//print jonas array has which type of elements in it
 
 for (let i = 0; i <= jons.length - 1; i++) {
   console.log(`${jons[i]} : ${typeof jons[i]}`);
@@ -1119,6 +1119,7 @@ addVat = addTax.bind(null, 0.2);
 console.log(addVat(100)); //120
 
 //IIFE
+
 // function () {
 //   console.log("this funcction will never run again");
 // }
@@ -1197,13 +1198,12 @@ innerFunction();
 // parentFnVaribls defined with var defined with let defined with const
 // innerFnVaribles defined in innerFn with var defined in innerFn with let defined in innerfn with const
 
-//CLOUSER
+//CLOSUER
 const secureBooking = function () {
   let passengersCount = 0;
   return function () {
     passengersCount++;
     console.log(`${passengersCount} passengers`);
-    return `${passengersCount} passengers`;
   };
 };
 console.log(secureBooking()); //[Function (anonymous)]
@@ -1688,13 +1688,13 @@ console.log(wordsFind.find((word) => word.length > 7));
 
 console.log(wordsFind.find((word) => word.length !== 5));
 //banana
-/*
+*/
 const fs = require("fs");
 
 const http = require("http");
 
 const express = require("express");
-// const app = express();
+const app = express();
 
 //write a middleware
 app.use((req, res, next) => {
@@ -1705,12 +1705,12 @@ app.use((req, res, next) => {
   console.log("in the second middleware");
 });
 app.listen(3000);
-
+/*
 //create a routes
 // const fs = require("fs");
 // const express = require("express");
 const bodyParser = require("body-parser");
-const app = express();
+// const app = express();
 
 app.use("/path", (req, res, next) => {
   console.log(req.body);
@@ -1790,8 +1790,8 @@ exports.signup = async (req, res, next) => {
     await user.save();
 
     const storeUser = await db
-      .collection("users")
-      .insrtOne({ email: email, password: hashedPW });
+    .collection("users")
+    .insrtOne({ email: email, password: hashedPW });
     if (storeUser === 1) {
       res
         .status(201)
@@ -1807,8 +1807,8 @@ exports.signup = async (req, res, next) => {
   }
   //or
   bcrypt
-    .hash(password, 12)
-    .then((hashedPW) => {
+  .hash(password, 12)
+  .then((hashedPW) => {
       const user = new User({
         email: email,
         password: hashedPW
@@ -1819,14 +1819,15 @@ exports.signup = async (req, res, next) => {
       res
         .status(201)
         .json({ message: "user created successfully", userId: res._id });
-    })
+      })
     .catch((Err) => {
       console.log(Err);
     });
-};
-*/
+  };
+
 //PROMISES
 //promise is an object which is used to store the future responsse of the api result
+*/
 /*
 // The promises can be constructed using new Promise() keyword this keyword will again
 // take one call back function which in turn takes two aruguments

@@ -35,7 +35,8 @@ function arrSum(arr) {
   for (let i = 0; i < arr.length; i++) {
     sum = sum + arr[i];
   }
-  return sum;
+  const sum1 = arr.reduce((acc, el) => acc + el, 0);
+  return { sum, sum1 };
 }
 
 console.log(arrSum([2]));
@@ -112,6 +113,7 @@ const sumOfFibanocciSeries = function (num) {
   for (let i = 0; i <= fibanoccciSeries.length - 1; i++) {
     sum += fibanoccciSeries[i];
   }
+
   return sum;
 };
 console.log(fibanocciSeries(2), sumOfFibanocciSeries(2));
@@ -125,6 +127,7 @@ function findOdd(num) {
   // console.log("1111 ", num);
   if (num <= 0) return false;
   if (num % 2 === 0) return false;
+
   return true;
 }
 
@@ -138,24 +141,31 @@ function findEven(num) {
 
 function addArray(arr) {
   if (arr.length < 1) return 0;
+
   let sum = 0;
   for (let i = 0; i <= arr.length - 1; i++) {
     sum += arr[i];
   }
+
   return sum;
 }
 
 const seperateArrintoOddndEven = (arr) => {
-  console.log(">>>>>", arr);
+  // console.log(">>>>>", arr);
+
   let evenNumsArr = [];
   let oddNumsArr = [];
+
   for (let i = 0; i < arr.length; i++) {
-    console.log("@@@@@@@@", arr[i]);
+    // console.log("@@@@@@@@", arr[i]);
+
     if (findOdd(arr[i])) oddNumsArr.push(arr[i]);
     if (findEven(arr[i])) evenNumsArr.push(arr[i]);
   }
-  console.log("even", evenNumsArr);
-  console.log("Odds", oddNumsArr);
+
+  // console.log("even", evenNumsArr);
+  // console.log("Odds", oddNumsArr);
+
   const evenSum = addArray(evenNumsArr);
   const oddSum = addArray(oddNumsArr);
 
@@ -185,7 +195,7 @@ const seperateArrintoOddndEven1 = (arr) => {
   const sumArr = (arr) => arr.reduce((acc, num) => num + acc, 0);
 
   const oddNumsArr = arr.filter(isOdd);
-  const evenNumsArr = arr.filter(isEven); //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< see how filter method is used
+  const evenNumsArr = arr.filter(isEven); // <<<<<<<<<<<<<<<<<<<<<<<<<< see how filter method is used
 
   const oddNumsSum = sumArr(oddNumsArr);
   const evenNumsSum = sumArr(evenNumsArr);
@@ -285,8 +295,10 @@ console.log(linearSearch([1, 3, 2, 4, 5, 6, 15, 99], 0));
 function binarySearch(arr, targetEl) {
   let i = 0;
   let n = arr.length - 1;
+
   while (i <= n) {
     let mid = Math.floor((i + n) / 2);
+
     if (arr[mid] === targetEl) {
       return `targetEl is found and its position is ${mid}`;
     } else if (arr[mid] < targetEl) {

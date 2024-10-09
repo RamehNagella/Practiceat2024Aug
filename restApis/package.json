@@ -1,7 +1,6 @@
 {
   "name": "restapis",
   "version": "1.0.0",
-  "description": "",
   "main": "interview.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -9,8 +8,12 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "blubird": "^0.0.1-security",
+    "bluebird": "^3.7.2",
     "body-parser": "^1.20.2",
-    "express": "^4.18.3",
+    "express": "^4.21.0",
     "mongodb": "^6.5.0"
-  }
+  },
+  "keywords": [],
+  "description": ""
 }
