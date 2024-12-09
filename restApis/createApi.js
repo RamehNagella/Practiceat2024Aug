@@ -54,6 +54,7 @@ app.put("/students/:id", (req, res, next) => {
     typeof parseInt(req.params),
     typeof req.params
   );
+
   const student = students.find((s) => s.id === parseInt(req.params.id));
   if (!student) {
     return res.status(404).json({ message: "Student  was not found." });
@@ -121,10 +122,15 @@ app.listen(port, () => {
 
 /*
 
-if I want to give some other persons my collection of data, then which url I have to give? how can i make a general api to create 
+if I want to give some other persons my collection of data, then which url I have to give? 
+how can i make a general api to create 
+
 ChatGPT said:
 ChatGPT
-If you want to give access to your API and make it publicly accessible, you'll need to deploy it to a web server or cloud service so that others can use a public URL instead of localhost. When the API is deployed online, it will have a public URL that others can use to access your collection of data.
+
+If you want to give access to your API and make it publicly accessible, you'll need to deploy it to a web 
+server or cloud service so that others can use a public URL instead of localhost. When the API is deployed 
+online, it will have a public URL that others can use to access your collection of data.
 
 Here’s a step-by-step guide to make your API publicly accessible and provide others with a URL to use:
 
@@ -135,9 +141,11 @@ Heroku (Free and easy to set up for Node.js)
 Vercel (Simple and easy for deploying small apps)
 Render
 AWS, Google Cloud, or Azure (if you need more control over hosting)
-For simplicity, let’s walk through the process of deploying your API on Heroku, which is commonly used for small Node.js applications.
+For simplicity, let’s walk through the process of deploying your API on Heroku, which is commonly used for
+ small Node.js applications.
 
 Deploying Your API on Heroku
+
 Step 1: Install the Heroku CLI
 First, you'll need to install the Heroku CLI (Command Line Interface) so you can interact with Heroku from the terminal.
 
@@ -186,7 +194,8 @@ Now, create a new Heroku app using the Heroku CLI:
 bash
 Copy code
 heroku create
-This command will create a new app with a random name (or you can specify your own app name). It will also give you the URL for your app (e.g., https://my-app-name.herokuapp.com).
+This command will create a new app with a random name (or you can specify your own app name). 
+It will also give you the URL for your app (e.g., https://my-app-name.herokuapp.com).
 
 Step 6: Deploy to Heroku
 Push your code to Heroku using git:
@@ -206,12 +215,15 @@ Now, you can access your API via a public URL like:
 
 https://my-app-name.herokuapp.com/students to get the list of students.
 https://my-app-name.herokuapp.com/students/1 to get a specific student by id.
+
 2. Give the URL to Others
-Once your API is deployed, you can give the public URL to anyone, and they can access the data from their browser or using tools like Postman.
+Once your API is deployed, you can give the public URL to anyone, and they can access the data from their 
+browser or using tools like Postman.
 
 For example, after deployment on Heroku:
 
 Your base API URL could be something like: https://my-student-api.herokuapp.com
+
 To access your data, people can use URLs like:
 GET all students: https://my-student-api.herokuapp.com/students
 GET student by ID: https://my-student-api.herokuapp.com/students/1

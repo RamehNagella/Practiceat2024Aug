@@ -475,7 +475,7 @@ db.movies
   .aggregate([
     { $group: { _id: "$netwerok.name", noOfShows: { $sum: 1 } } },
     { $project: { "$network.name": 1, noOfShows: 1 } }
-  ])
+  ]) // ^ here no $ required
   .pretty();
 //   assert: command failed: {
 // 	"ok" : 0,
@@ -966,6 +966,7 @@ db.movies.aggregate([
   { $match: { genreCount: { $gt: 1 } } },
   { $project: { name: 1, _id: 0, genreCount: 1 } }
 ]);
+
 /*
 { "name" : "Under the Dome", "genreCount" : 3 }
 { "name" : "Person of Interest", "genreCount" : 3 }
@@ -1036,9 +1037,20 @@ db.movies.aggregate([
   },
   { $sort: { avgRating: -1 } }
 ]);
+db.movies.aggregate([
+  { $unwind: "$genres" },
+  {
+    $group: {
+      _id: "$genres",
+      totalMovies: { $sum: 1 },
+      avgRating: { $avg: "$rating.average" }
+    }
+  },
+  { $sort: { avgRating: -1 } }
+]);
 /*
 { "_id" : "Crime", "totalMovies" : 5, "avgRating" : 8.36 }
-{ "_id" : "Espionage", "totalMovies" : 1, "avgRating" : 8.3 } db.movies.aggregate([   { $unwind: "$genres" },   { $group:{_id: "$genres", totalMovies:{$sum:1},avgRating: { $avg: "$rating.average" } }},   { $sort: { avgRating: -1 } }])
+{ "_id" : "Espionage", "totalMovies" : 1, "avgRating" : 8.3 }
 { "_id" : "Crime", "totalMovies" : 5, "avgRating" : 8.36 }
 { "_id" : "Espionage", "totalMovies" : 1, "avgRating" : 8.3 }
 { "_id" : "Supernatural", "totalMovies" : 3, "avgRating" : 8.299999999999999 }
@@ -1079,6 +1091,7 @@ db.movies.aggregate([
   },
   { $sort: { totalMovies: -1 } }
 ]);
+
 /*
 { "_id" : "Drama", "totalMovies" : 19, "avgRating" : 6.5 }
 { "_id" : "Action", "totalMovies" : 9, "avgRating" : 9 }
@@ -1103,6 +1116,7 @@ db.movies.aggregate([
   { $group: { _id: "$genres", totalMoviesperGenre: { $sum: 1 } } },
   { $sort: { totalMoviesperGenre: -1 } }
 ]);
+
 /*
 { "_id" : "Drama", "totalMoviesperGenre" : 19 }
 { "_id" : "Action", "totalMoviesperGenre" : 9 }
@@ -1367,7 +1381,7 @@ db.movies.aggregate([
 { "_id" : ObjectId("64e3b1874ff5db12d7a58e98"), "name" : "The Last Ship", "language" : "English" }
 */
 
-//$addToFields working on
+//$addFields working on
 db.movies
   .aggregate([
     {

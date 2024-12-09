@@ -180,9 +180,12 @@ var x = 1;
 
 // console.log(x === window.x);
 // ReferenceError: Window is not defined
-// In JavaScript, the Window object represents the global window in a browser environment. The global object in a browser environment is typically the window object.
-// When you declare a variable without explicitly specifying its scope using var, it becomes a property of the global object.
-// The console.log(x === Window.x); statement is checking whether the value of x is equal to the value of x attached to the Window object
+// In JavaScript, the Window object represents the global window in a browser environment. The global 
+// object in a browser environment is typically the window object.
+// When you declare a variable without explicitly specifying its scope using var, it becomes a property of 
+// the global object.
+// The console.log(x === Window.x); statement is checking whether the value of x is equal to the value of x
+//  attached to the Window object
 
 console.log(typeof NaN); //number
 console.log(null);
@@ -549,7 +552,7 @@ for (const temp of tempArr.keys()) {
 // 5
 // 6
 
-//LOOPING THE OPBJCTS
+//LOOPING THE OBJCTS
 
 const object1 = {
   key1: Number,
@@ -733,7 +736,8 @@ console.log(plane.slice(1));
 // 20
 // 320
 
-//to slice some part of the strings we have to enter starting position of the letter ans ending position of the letter
+//to slice some part of the strings we have to enter starting position of the letter and
+ ending position of the letter
 
 console.log(airLine.slice(4, 8));
 console.log(airLine.slice(airLine.indexOf("Air"), airLine.indexOf("Portugal")));
@@ -931,7 +935,7 @@ console.log(bookedData);
 //     BookingId: 342552
 //   }
 // ]
-
+*/
 const greeting = (greeting) => {
   return function (name) {
     console.log(`${greeting} ${name}`);
@@ -1189,7 +1193,8 @@ const accessVarInnerfn = function (name, age) {
   };
 };
 accessVarInnerfn("Max", 34);
-//  To execute the inner function and see its logs, you need to capture the returned function and then invoke it separately.
+//  To execute the inner function and see its logs, you need to capture the returned function and then
+// invoke it separately.
 const innerFunction = accessVarInnerfn("Manu", 33);
 innerFunction();
 
@@ -1208,7 +1213,7 @@ const secureBooking = function () {
 };
 console.log(secureBooking()); //[Function (anonymous)]
 secureBooking();
-//NO OUTPUT IS CAME BECAUSE WE ARE CALLINF ONLY PARENT FUNCTION NOT INNER FUNCTION SO
+//NO OUTPUT IS CAME BECAUSE WE ARE CALLING ONLY PARENT FUNCTION NOT INNER FUNCTION SO
 //TO CALL THE INNER FUNCITON WE NEED TO DECLARE THE CLOUSER FUNCTION WITH ANOTHER VARIBLE
 
 const booker = secureBooking();
@@ -1248,6 +1253,7 @@ console.log(array1.slice(2));
 console.log(array1.slice(-1));
 console.log(array1.slice(1));
 console.log(array1.slice(-3));
+
 // 5
 // [ 'c', 'd', 'e' ]
 // [ 'e' ]
@@ -1372,17 +1378,18 @@ for (const [i, el] of movements.entries()) {
 // 8: Rs.13 Deposted
 
 //FOREACH
+
 movements.forEach((mov) => {
-  console.log(`${mov}${mov > 0 ? "Deposited" : "withdrwan"}`);
+  console.log(`${Math.abs(mov)} ${mov > 0 ? "Deposited" : "withdrwan"}`);
 });
-// 2Deposited
-// 4Deposited
-// -4withdrwan
-// 30Deposited
-// -7withdrwan
-// -1withdrwan
-// 1Deposited
-// 13Deposited
+// 2 Deposited
+// 4 Deposited
+// 4 withdrwan
+// 30 Deposited
+// 7 withdrwan
+// 1 withdrwan
+// 1 Deposited
+// 13 Deposited
 
 movements.forEach((mov, i) => {
   console.log(`${i}: ${mov} `);
@@ -1482,6 +1489,7 @@ const createUserName = function (name) {
 };
 createUserName(user1);
 createUserName(user2);
+
 const user5 = "Steven Thomos Williams";
 const user6 = "Jonas Schmedthmann";
 const user3 = "ramesh babu Nagella";
@@ -1540,6 +1548,7 @@ console.log(adults);
 // ]
 const names = ["Alice", "Bob", "Charlie", "David", "Eva"];
 // filter  an array of string to extract names that start with a specific letter
+
 //find the names that start with D and A
 const namesStartWithDandA = names.filter(
   (name) => name.startsWith("D") || name.startsWith("A")
@@ -1673,10 +1682,12 @@ const usersFind = [
   { id: 2, name: "Bob" },
   { id: 3, name: "Charlie" }
 ];
+
 //find the object based on property value
 
 console.log(usersFind.find((el) => el.name == "Bob"));
 // { id: 2, name: 'Bob' }
+
 console.log(usersFind.find((el) => el.name == "Charlie"));
 // { id: 3, name: 'Charlie' }
 
@@ -1688,7 +1699,7 @@ console.log(wordsFind.find((word) => word.length > 7));
 
 console.log(wordsFind.find((word) => word.length !== 5));
 //banana
-*/
+
 const fs = require("fs");
 
 const http = require("http");
@@ -1705,7 +1716,7 @@ app.use((req, res, next) => {
   console.log("in the second middleware");
 });
 app.listen(3000);
-/*
+
 //create a routes
 // const fs = require("fs");
 // const express = require("express");
@@ -1730,7 +1741,9 @@ app.use("/", (req, res, next) => {
 Router.get("/post/:postId", async (req, res, next) => {
   const prodId = req.params.postId;
   //finding the product from database
-  const product = await db.collection("products").findOne({ prodId: producId });
+  const product = await db
+    .collection("products")
+    .findOne({ prodId: productId });
 
   if (!product) {
     const error = new Error("product is not found.");
@@ -1790,9 +1803,10 @@ exports.signup = async (req, res, next) => {
     await user.save();
 
     const storeUser = await db
-    .collection("users")
-    .insrtOne({ email: email, password: hashedPW });
-    if (storeUser === 1) {
+      .collection("users")
+      .insrtOne({ email: email, password: hashedPW });
+
+    if (!storeUser.insertedCount) {
       res
         .status(201)
         .json({ message: "user created successfully", user: user });
@@ -1807,8 +1821,8 @@ exports.signup = async (req, res, next) => {
   }
   //or
   bcrypt
-  .hash(password, 12)
-  .then((hashedPW) => {
+    .hash(password, 12)
+    .then((hashedPW) => {
       const user = new User({
         email: email,
         password: hashedPW
@@ -1819,25 +1833,25 @@ exports.signup = async (req, res, next) => {
       res
         .status(201)
         .json({ message: "user created successfully", userId: res._id });
-      })
+    })
     .catch((Err) => {
       console.log(Err);
     });
-  };
+};
 
 //PROMISES
 //promise is an object which is used to store the future responsse of the api result
-*/
-/*
+
 // The promises can be constructed using new Promise() keyword this keyword will again
 // take one call back function which in turn takes two aruguments
 // one for resolve, and reject
 // if promise is successed then it prints with resolves
 // other it rejects
+
 fetch("https://restcountries.com/v2/name/portugal")
   .then((res) => res.json())
   .then((result) => {
-    // console.log("?????", result);
+    console.log("?????", result);
   })
   .catch((err) => {
     console.error(err);
@@ -1867,6 +1881,7 @@ const countryData = async function (country) {
 //     throw error;
 //   }
 // };
+
 // whereAmI(52.508, 13.368)
 //   .then((res) => res.json())
 //   .then((result) => {
@@ -1939,7 +1954,7 @@ const main = async () => {
   }
 };
 main();
-*/
+
 console.log(new Date("2015-06-01"));
 //2015-06-01T00:00:00.000Z
 console.log(new Date("2013-06-24T00:00:00Z"));

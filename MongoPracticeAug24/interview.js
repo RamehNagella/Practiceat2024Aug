@@ -1292,3 +1292,396 @@ db.collection.aggregate([
   { $unwind: "$genres" },
   { $group: { _id: "$name", totalGenres: { $sum: 1 } } }
 ]);
+// find the documents premired after a specific data
+db.collection.aggregate([
+  {
+    $match: {
+      $expr: {
+        $gt: [
+          "$premiered",
+          {
+            $dataFromString: {
+              dateString: "June 1, 2015",
+              format: "%B %d, %Y"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    $project: { movieName: "$name" }
+  }
+]);
+// or
+db.collection.aggregate([
+  { $match: { premiered: { $eq: new Date("2015-06-1") } } },
+  { $project: { _id: 1, name: 1, genres: 1, premiered: 1 } }
+]);
+
+// after a date
+db.collection.aggregate([{ $match: { premiered: { $gt: "2013-04-23" } } }]);
+db.collection.aggregate([
+  { $match: { premiered: { $gt: "2012-03-2" } } },
+  { $count: "noOfshows" }
+]);
+// { "numberOfShows" : 4 }
+// 4. Find the Number of Shows per Network
+db.collection.aggregate([
+  { groupBy: { _id: "network.name", count: { $sum: 1 } } }
+]);
+
+// { "_id" : "Space", "count" : 1 }
+// { "_id" : "The CW", "count" : 1 }
+// { "_id" : "HBO", "count" : 1 }
+// { "_id" : "CBS", "count" : 2 }
+
+db.movies
+  .aggregate([
+    { $group: { _id: "$netwrok.name", noOfShows: { $sum: 1 } } },
+    { $project: { "network.name": 1, noOfShows: 1 } }
+  ])
+  .pretty();
+// { "_id" : null, "noOfShows" : 5 }
+//becuse after using a field name for group key we should not use same fieldName for  projection, since the
+//field name is no longer available after groupkey usage.
+
+//find the no of showa which are greater tha 7.0
+db.collection.aggregate([
+  { $match: { "rating.average": { $gt: 7.0 } } },
+  { project: { "no of shows ": { $sum: 1 } } }
+]);
+
+[
+  {
+    _id: ObjectId("64e3ad5a4ff5db12d7a58e8b"),
+    "no of shows greater than 7": 1
+  },
+  {
+    _id: ObjectId("64e3adfd4ff5db12d7a58e8d"),
+    "no of shows greater than 7": 1
+  },
+  { _id: ObjectId("64e3adfd4ff5db12d7a58e8e"), "no of shows greater than 7": 1 }
+];
+// it only print the values but not sum
+
+//whic is wrong
+
+db.collection.aggregate([
+  { $match: { "rating.average": { $gt: 7.0 }, count: { $sum: 1 } } }
+]);
+//it is also wrong because we cannot use $sum in match stage
+
+//correct query
+db.collection.aggregate([
+  { $match: { "rating.average": { $gt: 7.0 } } },
+  { $count: "totalShows" }
+]);
+//find shows which are not from united states
+db.collection.aggregate([
+  { $match: { "network.country.name": { $ne: "USA" } } }
+]);
+
+//finding the shows which are belongs to each genre
+
+db.movies.aggregate([
+  { $unwind: "$genres" },
+  { $group: { _id: "$genres", showName: "$name" } }
+]);
+
+// assert: command failed: {
+// 	"ok" : 0,
+// 	"errmsg" : "The field 'showName' must be an accumulator object",
+
+//because
+// Fields within the "$group" stage must either be part of the _id key or
+// use an accumulator operator(e.g., "$sum","$avg","$push", "addToSet")
+// //the above query is completely wrong.
+//correct query
+db.movies.aggregate(
+  { $unwind: "$genres" },
+  { $group: { _id: "$genres", showName: { $push: "$name" } } }
+);
+[
+  {
+    _id: "Thriller",
+    shows: [
+      "Under the Dome",
+      "True Detective",
+      "Homeland",
+      "Revenge",
+      "Penny Dreadful",
+      "The Strain",
+      "The Last Ship"
+    ]
+  }
+  // and more docs
+];
+// which shows belongs to more than one genre?
+db.movies.aggregate([
+  { $group: { _id: "$name", genresSize: { $size: "$genres" } } },
+  { $match: { genresSize: { $gt: 1 } } }
+]);
+//wrong because WITHIN THE $GROUP STAGE WE CANNOT USE $SIZE OPERATOR
+db.movies.aggregate([
+  { $project: { _id: "$name", genresSize: { $size: "$genres" } } },
+  { $match: { $genres: { $gt: 1 } } }
+]); //ouput
+// {
+// "_id": "Movie A",
+// "genresSize": 2
+// }
+//
+
+//total no of episodes per show
+db.collection.aggregate([
+  { $group: { _id: "$name" } },
+  { $project: { totalShowsPerNetwork: { $sum: ["$episodes", 1] } } }
+]);
+// which is wrong
+db.collection.aggregate([
+  { $group: { _id: "$name", noOfEpisodes: { $sum: "$episodes" } } }
+]);
+// $sum expects numeric value here, not field name, but is will work because the value of "episodes" is NUMERIC
+// hence it will work as expected.
+//if value of field name is numeric we can directly use in $sum accumulator
+//if value of field name is non-numeric or any other type
+db.collection.aggregate([
+  { $project: { noofshows: { $size: "$episodes" } } },
+  { $group: { _id: "$name", totalEpisodes: "$noofshows" } }
+]);
+
+// find the average rating per each genres
+db.collection.aggregate([
+  { $unwind: "$genres" },
+  {
+    $group: {
+      _id: "$genres",
+      totalaMovies: { $sum: 1 },
+      averageRating: { $avg: "$rating.averge" }
+    }
+  },
+  { $sort: -1 }
+]);
+
+//print data month and day
+db.collection.aggregate([
+  {
+    $project: {
+      name: "$name",
+      premiered: 1,
+      year: { $year: { $dateFromString: { dateString: "$premiered" } } },
+      month: { $month: { $dateFromString: { dateString: "$premiered" } } },
+      day: { $dayOfMonth: { $dateFromString: { dateString: "$premiered" } } }
+    }
+  }
+]);
+//find how many movies released in 2014
+db.collection.aggregte([
+  {
+    $project: {
+      name: 1,
+      premieredDate: "$premiered",
+      releasedYear: { $year: { $dateFromString: { dateString: "$premiered" } } }
+    }
+  },
+  { $match: { releasedYear: { $q: 2014 }, totalMovies: { $sum: 1 } } }
+]);
+// Each stage operator must contain only one top-level field that
+//  corresponds to the operator itself.
+// differentiate the docs on different average rating
+db.collection.aggregate([
+  {
+    $bucket: {
+      groupBy: "$rating.average",
+      boundaries: [0, 6, 8, 9, 10],
+      default: "others",
+      output: {
+        count: { $sum: 1 },
+        showName: { $push: "$name" }
+      }
+    }
+  }
+]);
+
+//output
+[
+  {
+    _id: 8, // one of boundary from [0,6,8,9,10]
+    count: 8,
+    shows: [
+      "Bitten",
+      "Arrow",
+      "The 100",
+      "Gotham",
+      "Constantine",
+      "The Amazing Race",
+      "The Strain",
+      "The Last Ship"
+    ]
+  }
+];
+//write a query that can categorizes the movies based on year
+db.collection.aggregate([
+  {
+    $project: {
+      name: 1,
+      year: { $year: { $dateFromString: { dateString: "$premiered" } } }
+    }
+  },
+  {
+    $bucket: {
+      groupBy: "$year",
+      boundaries: [1990, 2000, 2010, 2022],
+      default: "others",
+      output: {
+        totalMovies: { $sum: 1 },
+        movieNames: { $push: "$name" },
+        premiered: { $push: "$premired" }
+      }
+    }
+  }
+]);
+[
+  {
+    _id: 2010,
+    count: 5,
+    movieNames: [
+      "Person of Interest",
+      "Homeland",
+      "Revenge",
+      "Grimm",
+      "Lost Girl"
+    ],
+    released: [
+      "2011-09-22",
+      "2011-10-02",
+      "2011-09-21",
+      "2011-10-28",
+      "2010-09-12"
+    ]
+  }
+];
+
+//$replaceRoot
+db.collection.aggregate([{ $replaceRoot: { newRoot: "$_link" } }]);
+db.movies
+  .aggregate([{ $replaceRoot: { newRoot: "$_links" } }, { $limit: 3 }])
+  .pretty();
+/*
+{
+	"self" : {
+		"href" : "http://api.tvmaze.com/shows/1"
+	},
+	"previousepisode" : {
+		"href" : "http://api.tvmaze.com/episodes/185054"
+	}
+}
+*/
+// but the original document is like this
+
+db.movies.find({}, { _id: 0, _links: 1 }).limit(3).pretty();
+/*
+{
+	"_links" : {
+		"self" : {
+			"href" : "http://api.tvmaze.com/shows/1"
+		},
+		"previousepisode" : {
+			"href" : "http://api.tvmaze.com/episodes/185054"
+		}
+	}
+}
+*/
+
+// find the no of people per state and find how many members are there per gender
+// and find their average age per gender
+
+// db.collection.aggregate([
+//   {
+//     $group: {
+//       _id: "$state_$gender",
+//       totalPersons: { $sum: 1 },
+
+//       averageAge: { $avg: "$dob.age" }
+//     }
+//   },
+//   { $sort: { totalPersons: -1 } }
+// ]);
+
+// // {$group:{_id:"$state", totalPersons:{$sum:1}}},
+//the correct query
+db.collection.aggregate([
+  {
+    $group: {
+      _id: { state: "$state", gender: "$gender" },
+      totalPersonsPerEachState: { $sum: 1 },
+      averagePeoplePerGender: { $avg: "$dob.age" }
+    }
+  }
+]);
+[
+  {
+    _id: { state: "California", gender: "male" },
+    totalPersonsPerEachState: 5,
+    averagePeoplePerGender: 32
+  },
+  {
+    _id: { state: "California", gender: "female" },
+    totalPersonsPerEachState: 8,
+    averagePeoplePerGender: 28
+  }
+];
+
+db.members.aggregate([
+  { $group: { _id: "$location.state" } },
+  {
+    $facet: {
+      maleStats: [
+        {
+          $group: {
+            _id: { gender: "$gender", state: "$location.state" },
+            totalpersonsPerGender: { $sum: 1 },
+            avgAgePerGender: { $avg: "$dob.age" }
+          }
+        },
+        { $sort: { totalpersonsPerGender: -1 } }
+      ],
+      femaleStats: [
+        {
+          $group: {
+            _id: { gender: "$gender", state: "$location.state" },
+            totalpersonsPerGender: { $sum: 1 },
+            avgAgePerGender: { $avg: "$dob.age" }
+          }
+        },
+        { $sort: { totalpersonsPerGender: 1 } }
+      ]
+    }
+  }
+]);
+[
+  {
+    maleStats: [
+      {
+        _id: { gender: "male", state: "California" },
+        totalpersonsPerGender: 5,
+        avgAgePerGender: 32
+      },
+      "..."
+    ],
+    femaleStats: [
+      {
+        _id: { gender: "female", state: "California" },
+        totalpersonsPerGender: 8,
+        avgAgePerGender: 28
+      },
+      "..."
+    ]
+  }
+];
+
+// Which one is correct?
+// If you want one output per gender per state, then Query 1 is better because it combines everything in a single output for each state and gender.
+
+// If you want to separate male and female statistics into distinct arrays (perhaps for reporting or structured data processing), then Query 2 is better.

@@ -2599,3 +2599,136 @@ results.forEach((result) => console.log(result));
 // console.log("ramesh".substring(0, 2), 10);
 // console.log(parseInt("123".substring(0, 2), 10));
 // console.log(parseInt("123".slice(0, 2), 10));
+function closestNumbers(arr) {
+  // Write your code here
+  // console.log(arr)
+  const sortArr = arr.sort((a, b) => a - b);
+
+  // let diffArr= [];
+  let minDiff = Infinity;
+  let output = [];
+  let diff;
+
+  for (let i = sortArr.length - 1; i > 0; i--) {
+    diff = sortArr[i] - sortArr[i - 1];
+    // 1.       = 10
+    // 2.       = 20
+    console.log("d", diff);
+    if (diff < minDiff) {
+      minDiff = diff;
+      //minD = 10;
+      console.log("oo", sortArr[i], sortArr[i - 1]);
+    } else if (diff === minDiff) {
+      console.log([sortArr[i], sortArr[i - 1]]);
+    }
+
+    // diffArr.push(diff);
+  }
+  console.log("ddd", diff);
+
+  sortArr.forEach((el, i, arr) => {
+    if (arr[i + 1] - el === diff) {
+      output.push(el, arr[i + 1]);
+    }
+  });
+  console.log(output);
+  return output;
+  // let minDiff = Infinity;
+  // let output = [];
+  // for(let i=1;i<arr.length;i++){
+  //     let diff = sortArr[i-1]-sortArr[i];
+
+  //     if(diff<minDiff){
+  //         minDiff = diff
+  //         output = [sortArr[i-1],sortArr[i]]
+  //     }else if(diff === minDiff){
+  //         output.push(sortArr[i-1], sortArr[i])
+  //     }
+  // }
+  // return output;
+}
+
+function closestNumbers(arr) {
+  // Write your code here
+  // console.log(arr)
+  const sortArr = arr.sort((a, b) => a - b);
+
+  let diffArr = [];
+  let diff = 0;
+  let output = [];
+
+  for (let i = sortArr.length - 1; i > 0; i--) {
+    diff = sortArr[i] - sortArr[i - 1];
+    diffArr.push(diff);
+  }
+  const diffrence = diffArr.sort((a, b) => a - b)[0];
+  console.log(diffrence);
+  sortArr.forEach((el, i, arr) => {
+    if (arr[i + 1] - el === diffrence) {
+      output.push(el, arr[i + 1]);
+    }
+  });
+  console.log(output);
+  return output;
+  // let minDiff = Infinity;
+  // let output = [];
+  // for(let i=1;i<arr.length;i++){
+  //     let diff = sortArr[i-1]-sortArr[i];
+
+  //     if(diff<minDiff){
+  //         minDiff = diff
+  //         output = [sortArr[i-1],sortArr[i]]
+  //     }else if(diff === minDiff){
+  //         output.push(sortArr[i-1], sortArr[i])
+  //     }
+  // }
+  // return output;
+}
+
+// Write your code here
+// Two players are playing a game of Tower Breakers! Player 1  always moves first, and both players always play optimally.The rules of the game are as follows:
+
+// Initially there are n towers.
+// Each tower is of height m.
+// The players move in alternating turns.
+// In each turn, a player can choose a tower of height x and reduce its height to y, where 1<y<=x and y evenly divides x.
+// If the current player is unable to make a move, they lose the game.
+// Given the values of n and m, determine which player will win. If the first player wins, return 1. Otherwise, return 2.
+function towerBreakers(n, m) {
+  // console.log(n, m);
+  if (m === 1) {
+    return 2;
+  }
+  if (n % 2 === 0) {
+    return 2;
+  }
+  return 1;
+}
+console.log("++++++");
+console.log(towerBreakers(2, 4));
+console.log(towerBreakers(2, 4));
+console.log(towerBreakers(3, 1));
+console.log(towerBreakers(3, 2));
+// 2
+// 2
+// 2
+// 1
+// Explanation:
+// 1. If m === 1: The first player has no valid moves, so the second player automatically wins.
+// 2. If n % 2 === 0: With an even number of towers, the second player can mirror the first player's
+// moves and win the game by reducing the last remaining towers to the smallest possible value.
+// 3. If n % 2 !== 0: With an odd number of towers, the first player can always make the first move on
+//  one of the towers, leaving the second player in a situation where they can't mirror, eventually
+// leading to the first player's victory.
+
+//here the second statment is taken in consider because
+//lets say we have even no of towers
+//if player1 moves first for total units of one tower then player2 will also move for same no of units of second tower
+// so that player1 cannot make move, and hence player 2 will become winner.
+
+// lets say we have odd no of towers
+//if player1 moves for total units of tower then player 2 also do for second tower and they left with 1 more tower
+// for that tower player1 has to make a move and he will make for entire tower units hence
+// player 2 not have any more moves hence he loss
+
+// so  if(n%2 === 0) player 2 will win if player 1 will start the game

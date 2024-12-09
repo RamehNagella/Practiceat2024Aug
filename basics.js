@@ -323,3 +323,128 @@ function bubbleSort(arr) {
     }
   }
 }
+const secureBooking = function () {
+  let passengersCount = 0;
+  console.log("//", passengersCount);
+  return function () {
+    passengersCount++;
+    console.log(passengersCount);
+    console.log(`${passengersCount} passengers`);
+    return passengersCount;
+  };
+};
+console.log(secureBooking()); //[Function (anonymous)]
+secureBooking();
+const booker = secureBooking();
+booker();
+booker();
+const movements = [2, 4, -4, 30, -7, -1, 1, 13];
+
+movements.forEach((mov) => {
+  console.log(`${Math.abs(mov)} ${mov > 0 ? "Deposited" : "withdrwan"}`);
+});
+
+// console.log(forEach1); //undeined
+const forEach1 = movements.forEach((mov) => mov);
+console.log(forEach1);
+// undefined
+console.log(movements.forEach((el) => el));
+// undefined
+
+const user5 = "Steven Thomos Williams";
+const user6 = "Jonas Schmedthmann";
+const user3 = "ramesh babu Nagella";
+const user4 = "Sara Williams Us";
+
+function creatUserName(name) {
+  // console.log("11", name);
+  let userName;
+
+  if (typeof name === "string") {
+    userName = name
+      .toLowerCase()
+      .split(" ")
+      .map((name) => name[0])
+      .join("");
+  } else {
+    const names = Array.from(name);
+
+    userName = names.map((name) => {
+      return name
+        .toLowerCase()
+        .split(" ")
+        .map((el) => el[0])
+        .join("");
+    });
+  }
+  return userName;
+}
+
+const users = [user5, user6, user3, user4];
+console.log(">>", creatUserName(users));
+console.log(">>", creatUserName("Thomose Alwa Edision"));
+console.log(">>", creatUserName(["Thomos Alwa Edision", "raj koti"]));
+const innerArr = [
+  [1, 2, [3, 4]],
+  [5, 6, [7, 8]]
+];
+console.log(innerArr.reduce((acc, cur) => acc.concat(cur), []));
+innerArr.reduce((acc, cur) => {
+  console.log("///", acc.concat(cur));
+  return acc.concat(cur);
+}, []);
+
+const arrayFind = [1, 2, 3, 4, 5, 6];
+console.log(arrayFind.find((el) => el > 2));
+console.log(arrayFind.find((el) => el < 2));
+//find method gives first element that meets the criteria
+console.log(arrayFind.find((el) => el === 2));
+
+console.log(arrayFind.findIndex((el) => el > 1));
+console.log(arrayFind.findIndex((el) => el < 2));
+console.log(arrayFind.findIndex((el) => el < 4));
+console.log(arrayFind.findIndex((el) => el === 1));
+// 1
+// 0
+// 0
+// 0
+
+// findIndex method gives the index position of the FIRST element which meets the specified critiria.
+
+console.log(
+  arrayFind.filter((el, i, arr) => {
+    return el > 4 ? arr[i] : 0;
+  })
+);
+// [ 5, 6 ]
+//array
+console.log(arrayFind.find((el) => el % 2 === 0));
+
+const usersFind = [
+  { id: 1, name: "Alice" },
+  { id: 2, name: "Bob" },
+  { id: 3, name: "Charlie" }
+];
+
+//find the object based on property value
+
+console.log(
+  usersFind.find((obj) => {
+    // console.log(obj);
+    return obj.name === "Bob";
+  })
+);
+// { id: 2, name: 'Bob' }
+const wordsFind = ["apple", "banana", "orange", "grapefruit"];
+
+//find the word with specific length
+console.log(wordsFind.find((fruite) => fruite.length === 5));
+console.log(wordsFind.find((fruite) => fruite.length >= 5));
+console.log(wordsFind.find((fruite) => fruite.length > 7));
+// apple
+// apple
+// grapefruit
+
+console.log(wordsFind.find((fruite) => fruite.length !== 5));
+//banana
+//gives only ONE element that meets the specified criteria
